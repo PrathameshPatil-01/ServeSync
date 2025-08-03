@@ -1,0 +1,194 @@
+.profile-settings-container {
+  display: flex;
+  gap: 24px;
+  width: 80%;
+  padding: 30px;
+  background: #f9f9fc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+}
+
+/* PROFILE CARD */
+.profile-card {
+  width: 40%;
+  background: white;
+  padding: 28px 24px;
+  border-radius: 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+.label {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 4px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.unverified {
+  color: #d9534f;
+  font-weight: 500;
+}
+
+.button-row {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.btn-outline, .btn-filled {
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline {
+  border: 2px solid #e94d4d;
+  color: #e94d4d;
+  background: white;
+}
+
+.btn-filled {
+  background: #e94d4d;
+  color: white;
+  border: none;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 24px 0 16px;
+}
+
+.preferences {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 14px;
+}
+
+.pref-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoice-note {
+  font-size: 13px;
+  color: #777;
+  margin-top: 8px;
+}
+
+/* SWITCH TOGGLE */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #e94d4d;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* OUTLET CARD */
+.outlet-card {
+  flex: 1;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: flex-start;
+  
+}
+
+.outlet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.outlet-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.outlet-sub {
+  font-size: 14px;
+  color: #777;
+}
+
+.outlet-contact {
+  display: flex;
+  align-items: center;
+  color: #444;
+  font-size: 14px;
+}
+
+.profile-card {
+  text-align: left;
+}
+
+.label,
+.value,
+.button-row,
+.preferences {
+  text-align: left;
+  align-items: flex-start;
+}
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 99;
+}
+
+.blur-bg {
+  filter: blur(3px);
+  pointer-events: none;
+}

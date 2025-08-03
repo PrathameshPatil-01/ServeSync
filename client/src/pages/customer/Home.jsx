@@ -1,26 +1,22 @@
-import { Box, Typography } from '@mui/material';
-import SearchBar from '../../components/home/SearchBar';
-import LocationSelector from '../../components/home/LocationSelector';
-import CategoryGrid from '../../components/home/CategoryGrid';
-import TopProvidersCarousel from '../../components/home/TopProvidersCarousel';
-import VerifiedBadgeBanner from '../../components/home/VerifiedBadgeBanner';
-import TestimonialsSection from '../../components/home/TestimonialsSection';
 
+import './Home.css';
+import ImageCarousel from './../../components/newHome/ImageCarousel';
+import RoleCards from './../../components/newHome/RoleCards';
+//import CategoryGrid from './../../components/home/CategoryGrid';
+import WorkerSection from './../../components/newHome/WorkerSection';
+import CategoriesGrid from './../../components/newHome/CategoriesGrid';
+import Navbar from '../../components/newHome/Navbar';
+import Footer from '../../components/Footer';
 export default function Home() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <Box>
-        <Typography variant="h4" gutterBottom>
-          What service are you looking for?
-        </Typography>
-        <SearchBar />
-        <LocationSelector />
-      </Box>
+    <div className ="home-wrapper" >
+      <Navbar/>
+     <ImageCarousel/>
+     <RoleCards/>
+     <CategoriesGrid/>
+     <WorkerSection/>
+     <Footer/>
 
-      <CategoryGrid />
-      <TopProvidersCarousel />
-      <VerifiedBadgeBanner />
-      <TestimonialsSection />
-    </Box>
+    </div>
   );
 }
