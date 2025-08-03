@@ -1,0 +1,48 @@
+// src/mockData/serviceData.js
+export const services = [
+  {
+    id: 1,
+    name: 'AC Repair',
+    provider: 'Rajesh Kumar',
+    category: 'AC Repair',
+    rating: 4.9,
+    price: 399,
+    image: '/assets/users/rajesh.jpg',
+  },
+  {
+    id: 2,
+    name: 'Haircut',
+    provider: 'Sneha Sharma',
+    category: 'Salon',
+    rating: 4.8,
+    price: 299,
+    image: '/assets/users/sneha.jpg',
+  },
+  {
+    id: 3,
+    name: 'Bathroom Cleaning',
+    provider: 'Anil Mehra',
+    category: 'Cleaning',
+    rating: 4.7,
+    price: 499,
+    image: '/assets/users/anil.jpg',
+  },
+  {
+    id: 4,
+    name: 'Tap Installation',
+    provider: 'Ravi Verma',
+    category: 'Plumbing',
+    rating: 4.6,
+    price: 249,
+    image: '/assets/users/ravi.jpg',
+  },
+  {
+    id: 5,
+    name: 'Fan Repair',
+    provider: 'Deepak Singh',
+    category: 'Electrician',
+    rating: 4.5,
+    price: 350,
+    image: '/assets/users/deepak.jpg',
+  },
+];

@@ -1,9 +1,9 @@
-// src/features/auth/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, signupUser, forgotPassword } from './authThunks';
+import { login, signup, requestPasswordReset } from './authThunks';
 
 const initialState = {
     user: null,
+    token: null,
     loading: false,
     error: null,
     isAuthDialogOpen: false,
@@ -27,29 +27,37 @@ const authSlice = createSlice({
         },
         logout: (state) => {
             state.user = null;
+            state.token = null;
             localStorage.removeItem('token');
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(loginUser.pending, signupUser.pending, forgotPassword.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(loginUser.fulfilled, (state, action) => {
+            .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
+                state.user = action.payload.user || null;
+                state.token = action.payload.token;
                 state.isAuthDialogOpen = false;
                 localStorage.setItem('token', action.payload.token);
             })
-            .addCase(signupUser.fulfilled, (state) => {
+            .addCase(signup.fulfilled, (state) => {
                 state.loading = false;
                 state.isAuthDialogOpen = false;
             })
-            .addCase(forgotPassword.fulfilled, (state) => {
+            .addCase(requestPasswordReset.fulfilled, (state) => {
                 state.loading = false;
                 state.isAuthDialogOpen = false;
             })
+            .addMatcher(
+                (action) =>
+                    [login.pending.type, signup.pending.type, requestPasswordReset.pending.type].includes(
+                        action.type
+                    ),
+                (state) => {
+                    state.loading = true;
+                    state.error = null;
+                }
+            )
             .addMatcher(
                 (action) => action.type.endsWith('rejected'),
                 (state, action) => {

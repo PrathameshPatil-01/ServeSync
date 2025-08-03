@@ -1,30 +1,45 @@
-// src/features/auth/authThunks.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import authService from '../../services/authService';
+import {
+  loginUser,
+  signupUser,
+  forgotPassword,
+} from '../../services/authService';
 
-export const loginUser = createAsyncThunk('auth/login', async (data, { rejectWithValue }) => {
+// LOGIN THUNK
+export const login = createAsyncThunk(
+  'auth/login',
+  async (credentials, { rejectWithValue }) => {
     try {
-        const res = await authService.login(data);
-        return res.data;
-    } catch (err) {
-        return rejectWithValue(err.response?.data?.message || err.message);
+      const userData = await loginUser(credentials);
+      return userData;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-});
+  }
+);
 
-export const signupUser = createAsyncThunk('auth/signup', async (data, { rejectWithValue }) => {
+// REGISTER THUNK
+export const signup = createAsyncThunk(
+  'auth/register',
+  async (userData, { rejectWithValue }) => {
     try {
-        const res = await authService.signup(data);
-        return res.data;
-    } catch (err) {
-        return rejectWithValue(err.response?.data?.message || err.message);
+      const result = await signupUser(userData);
+      return result;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-});
+  }
+);
 
-export const forgotPassword = createAsyncThunk('auth/forgot', async (email, { rejectWithValue }) => {
+// FORGOT PASSWORD THUNK
+export const requestPasswordReset = createAsyncThunk(
+  'auth/forgotPassword',
+  async (email, { rejectWithValue }) => {
     try {
-        const res = await authService.forgotPassword(email);
-        return res.data;
-    } catch (err) {
-        return rejectWithValue(err.response?.data?.message || err.message);
+      const result = await forgotPassword(email);
+      return result;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-});
+  }
+);

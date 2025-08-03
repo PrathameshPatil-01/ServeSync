@@ -1,7 +1,11 @@
 DROP DATABASE IF EXISTS servsync;
 CREATE DATABASE servsync;
 USE servsync;
+
+
 SET FOREIGN_KEY_CHECKS = 0;
+
+
 DROP TABLE IF EXISTS role_types,
 service_categories,
 verification_statuses,
@@ -22,7 +26,11 @@ payments,
 reviews,
 audit_actions,
 audit_logs;
+
+
 START TRANSACTION;
+
+
 -- 1. Lookup Tables
 CREATE TABLE role_types (
     role_type_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -30,18 +38,24 @@ CREATE TABLE role_types (
     -- customer, provider, admin
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE service_categories (
     category_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     category_name VARCHAR(20) NOT NULL UNIQUE,
     -- home, store, hybrid
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE verification_statuses (
     status_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     status_name VARCHAR(20) NOT NULL UNIQUE,
     -- pending, approved, rejected
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 2. Core Tables
 CREATE TABLE users (
     user_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -58,6 +72,8 @@ CREATE TABLE users (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_phone (phone_country_code, phone_number)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE user_roles (
     user_id BIGINT UNSIGNED NOT NULL,
     role_type_id TINYINT UNSIGNED NOT NULL,
@@ -66,6 +82,8 @@ CREATE TABLE user_roles (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (role_type_id) REFERENCES role_types(role_type_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 3. Service Catalog
 CREATE TABLE services (
     service_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -77,6 +95,8 @@ CREATE TABLE services (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES service_categories(category_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE sub_services (
     sub_service_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     service_id INT UNSIGNED NOT NULL,
@@ -89,6 +109,8 @@ CREATE TABLE sub_services (
     UNIQUE (service_id, sub_service_name),
     FOREIGN KEY (service_id) REFERENCES services(service_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 4. Provider Management
 CREATE TABLE service_providers (
     provider_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -103,6 +125,8 @@ CREATE TABLE service_providers (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE provider_services (
     provider_service_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     provider_id BIGINT UNSIGNED NOT NULL,
@@ -117,6 +141,8 @@ CREATE TABLE provider_services (
     FOREIGN KEY (provider_id) REFERENCES service_providers(provider_id),
     FOREIGN KEY (sub_service_id) REFERENCES sub_services(sub_service_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 5. Verification System
 CREATE TABLE provider_verifications (
     verification_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -135,6 +161,8 @@ CREATE TABLE provider_verifications (
     FOREIGN KEY (status_id) REFERENCES verification_statuses(status_id),
     FOREIGN KEY (verified_by) REFERENCES users(user_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 6. Address System
 CREATE TABLE addresses (
     address_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -150,6 +178,8 @@ CREATE TABLE addresses (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE user_addresses (
     user_id BIGINT UNSIGNED NOT NULL,
     address_id BIGINT UNSIGNED NOT NULL,
@@ -158,12 +188,16 @@ CREATE TABLE user_addresses (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 7. Booking System
 CREATE TABLE booking_statuses (
     status_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     status_name VARCHAR(20) NOT NULL UNIQUE,
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE bookings (
     booking_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
@@ -186,17 +220,23 @@ CREATE TABLE bookings (
     FOREIGN KEY (status_id) REFERENCES booking_statuses(status_id),
     INDEX idx_booking_dates (scheduled_start, scheduled_end)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 8. Payment System
 CREATE TABLE payment_methods (
     method_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     method_name VARCHAR(20) NOT NULL UNIQUE,
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE payment_statuses (
     status_id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     status_name VARCHAR(20) NOT NULL UNIQUE,
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 CREATE TABLE payments (
     payment_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     booking_id BIGINT UNSIGNED NOT NULL UNIQUE,
@@ -213,6 +253,8 @@ CREATE TABLE payments (
     FOREIGN KEY (method_id) REFERENCES payment_methods(method_id),
     FOREIGN KEY (status_id) REFERENCES payment_statuses(status_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 9. Review System
 -- 1. Review Type Definition
 CREATE TABLE review_types (
@@ -221,6 +263,8 @@ CREATE TABLE review_types (
     -- 'provider_to_customer', 'customer_to_provider'
     description VARCHAR(255)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 2. Enhanced Review Table (Maintaining your original columns)
 CREATE TABLE reviews (
     review_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -251,6 +295,8 @@ CREATE TABLE reviews (
     INDEX idx_reviewee (reviewee_id, type_id),
     INDEX idx_booking_review (booking_id, type_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 -- 10. Audit & Compliance
 CREATE TABLE audit_actions (
     action_id SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -270,8 +316,14 @@ CREATE TABLE audit_logs (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (action_id) REFERENCES audit_actions(action_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
 COMMIT;
+
+
 SET FOREIGN_KEY_CHECKS = 1;
+
+
 -- Populate lookup tables first
 INSERT INTO role_types (role_name)
 VALUES ('customer'),
@@ -285,6 +337,8 @@ INSERT INTO verification_statuses (status_name)
 VALUES ('pending'),
     ('approved'),
     ('rejected');
+
+    
 -- For frequently accessed aggregates like ratings
 CREATE VIEW provider_ratings AS
 SELECT p.provider_id,
