@@ -1,29 +1,102 @@
-// src/pages/auth/ForgotPassword.jsx
-import { TextField, Button, Link } from '@mui/material';
-import AuthFormWrapper from '../../components/auth/AuthFormWrapper';
-import { useState } from 'react';
+import React from 'react';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Link as MuiLink
+} from '@mui/material';
+import { useEffect } from 'react';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { requestPasswordReset } from '../../redux/auth/authThunks';
+import AuthLayout from '../../layouts/AuthLayout';
+import { clearAuthMessages } from '../../redux/auth/authSlice'; // create this action
 
-export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
+const validationSchema = Yup.object({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+});
 
-  const handleReset = () => {
-    // TODO: Add API call to send reset link
-    console.log('Reset link sent to:', email);
-  };
+export default function ForgotPasswordForm() {
+  const dispatch = useDispatch();
+  const { loading, error, successMessage } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+      dispatch(clearAuthMessages()); // Clear messages on component mount   
+    }, [dispatch]);
 
   return (
-    <AuthFormWrapper title="Reset Password">
-      <TextField
-        fullWidth margin="normal"
-        label="Email" type="email"
-        value={email} onChange={e => setEmail(e.target.value)}
-      />
-      <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={handleReset}>
-        Send Reset Link
-      </Button>
-      <Link href="/auth/login" underline="hover" sx={{ display: 'block', mt: 2 }}>
-        Back to Login
-      </Link>
-    </AuthFormWrapper>
+    <AuthLayout title="Forgot Password">
+      <Formik
+        initialValues={{ email: '' }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { setSubmitting }) => {
+          dispatch(requestPasswordReset(values.email))
+            .unwrap()
+            .catch(() => setSubmitting(false));
+        }}
+      >
+        {({
+          values,
+          handleChange,
+          handleBlur,
+          touched,
+          errors,
+          isSubmitting,
+        }) => (
+          <Form noValidate>
+            <Box display="flex" flexDirection="column" gap={2}>
+              {/* Instruction Message */}
+              <Typography variant="body2" color="text.secondary" align="center">
+                Enter your registered email. We’ll send a reset link if it matches our records.
+              </Typography>
+
+              {/* Error Message */}
+              {error && (
+                <Typography color="error" fontSize="0.9rem" align="center">
+                  {error}
+                </Typography>
+              )}
+
+              {/* Success Message */}
+              {successMessage && (
+                <Typography color="success.main" fontSize="0.9rem" align="center">
+                  {successMessage}
+                </Typography>
+              )}
+
+              <TextField
+                name="email"
+                label="Email"
+                fullWidth
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={loading || isSubmitting}
+              >
+                {loading || isSubmitting ? 'Sending reset link...' : 'Send Reset Link'}
+              </Button>
+
+              <Typography variant="body2" align="center">
+                Remember your password?{' '}
+                <MuiLink component={Link} to="/auth/login" underline="hover">
+                  Login
+                </MuiLink>
+              </Typography>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+    </AuthLayout>
   );
 }

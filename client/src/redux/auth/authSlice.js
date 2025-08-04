@@ -1,72 +1,85 @@
-import { createSlice } from '@reduxjs/toolkit';
+// src/features/auth/authSlice.js
+import { createSlice, isRejected } from '@reduxjs/toolkit';
 import { login, signup, requestPasswordReset } from './authThunks';
 
+// Action groups for cleaner matchers
+const asyncActions = [login, signup, requestPasswordReset];
+
 const initialState = {
-    user: null,
-    token: null,
+    userId: null,
+    token: localStorage.getItem('token') || null,
     loading: false,
     error: null,
-    isAuthDialogOpen: false,
-    authMode: 'login', // 'signup' | 'forgot'
+    signupSuccess: false,
 };
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        openAuthDialog: (state, action) => {
-            state.isAuthDialogOpen = true;
-            state.authMode = action.payload || 'login';
-        },
-        closeAuthDialog: (state) => {
-            state.isAuthDialogOpen = false;
+        clearAuthMessages: (state) => {
             state.error = null;
-        },
-        setAuthMode: (state, action) => {
-            state.authMode = action.payload;
+            state.signupSuccess = false;
+            state.loading = false;
         },
         logout: (state) => {
-            state.user = null;
+            state.userId = null;
             state.token = null;
             localStorage.removeItem('token');
+        },
+        resetAuthState: (state) => {
+            state.signupSuccess = false; // ✅ Custom reset after redirect
         },
     },
     extraReducers: (builder) => {
         builder
+            // ✅ LOGIN success
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.user || null;
+                state.userId = action.payload.userId || null;
                 state.token = action.payload.token;
-                state.isAuthDialogOpen = false;
                 localStorage.setItem('token', action.payload.token);
             })
+
+            // ✅ SIGNUP success
             .addCase(signup.fulfilled, (state) => {
                 state.loading = false;
-                state.isAuthDialogOpen = false;
+                state.signupSuccess = true;
             })
+
+            // ✅ PASSWORD RESET success
             .addCase(requestPasswordReset.fulfilled, (state) => {
                 state.loading = false;
-                state.isAuthDialogOpen = false;
             })
+
+            // ✅ Handle all .pending cases
             .addMatcher(
-                (action) =>
-                    [login.pending.type, signup.pending.type, requestPasswordReset.pending.type].includes(
-                        action.type
-                    ),
+                (action) => asyncActions.some((thunk) => thunk.pending.match(action)),
                 (state) => {
                     state.loading = true;
                     state.error = null;
+                    state.signupSuccess = false;
                 }
             )
-            .addMatcher(
-                (action) => action.type.endsWith('rejected'),
-                (state, action) => {
-                    state.loading = false;
-                    state.error = action.payload || 'Something went wrong';
-                }
-            );
+
+            // ✅ Handle all .rejected cases
+            .addMatcher(isRejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Something went wrong';
+            });
     },
 });
 
-export const { openAuthDialog, closeAuthDialog, setAuthMode, logout } = authSlice.actions;
+// ✅ Export actions
+export const { logout, clearAuthMessages, resetAuthState } = authSlice.actions;
+
+// ✅ Selectors
+export const selectAuth = (state) => state.auth;
+export const selectIsAuthenticated = (state) => !!state.auth.token;
+export const selectAuthUserId = (state) => state.auth.userId;
+export const selectAuthLoading = (state) => state.auth.loading;
+export const selectAuthError = (state) => state.auth.error;
+export const selectSignupSuccess = (state) => state.auth.signupSuccess;
+
+// ✅ Export reducer
 export default authSlice.reducer;
