@@ -1,50 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { fetchAllProviders } from '../../api/providerService';
 import './PeopleCardSlider.css';
 
-// Example person data
-const people = [
-  {
-    name: 'Anita Sharma',
-    profession: 'Electrician',
-    description: 'Expert in residential and industrial wiring with 5+ years of experience.',
-    image: '/images/anita.jpg',
-    bgColor: '#B4D4FF',
-  },
-  {
-    name: 'Rahul Mehta',
-    profession: 'Plumber',
-    description: 'Specialist in bathroom fitting and water systems.',
-    image: '/images/rahul.jpg',
-    bgColor: '#FAD9E6',
-  },
-  {
-    name: 'Seema Yadav',
-    profession: 'Carpenter',
-    description: 'Customized furniture and modular kitchen expert.',
-    image: '/images/seema.jpg',
-    bgColor: '#D0F0E8',
-  },
-  {
-    name: 'Amit Verma',
-    profession: 'Painter',
-    description: 'Interior and exterior painting with artistic finishes.',
-    image: '/images/amit.jpg',
-    bgColor: '#FFF1AC',
-  },
-  {
-    name: 'Priya Das',
-    profession: 'Mason',
-    description: 'Strong foundation and structural work specialist.',
-    image: '/images/priya.jpg',
-    bgColor: '#E4DBF5',
-  },
-];
-
 const PeopleCardSlider = () => {
+  const [people, setPeople] = useState([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const providers = await fetchAllProviders();
+
+        const formattedData = providers.map(provider => ({
+          name: provider.fullName,
+          profession: provider.skills || 'Professional',
+          description: provider.description || 'No description provided.',
+          image: provider.profileImage
+            ? `data:image/jpeg;base64,${provider.profileImage}`
+            : '/images/default-profile.jpg', // fallback if image is missing
+          bgColor: getRandomColor(),
+        }));
+
+        setPeople(formattedData);
+      } catch (error) {
+        console.error('Failed to load providers:', error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  const getRandomColor = () => {
+    const colors = ['#B4D4FF', '#FAD9E6', '#D0F0E8', '#FFF1AC', '#E4DBF5'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   return (
     <div className="people-slider-wrapper">
       <h2 className="people-title">Our Top Professionals</h2>
-
       <div className="people-card-container">
         {people.map((person, index) => (
           <div

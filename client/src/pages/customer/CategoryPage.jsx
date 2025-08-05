@@ -9,11 +9,11 @@ import Footer from '../../components/Footer';
 
 const sampleProducts = [
   {
-    name: 'Fan Wiring Service',
+    name: 'Shubham Sakande',
     quantity: 'Per Visit',
     price: 250,
-    label: 'Basic',
-    category: 'electricians',
+    label: 'Flooring',
+    category: 'flooring',
     image: '/images/fan-wiring.png',
   },
   {
@@ -21,19 +21,19 @@ const sampleProducts = [
     quantity: 'Per Light',
     price: 150,
     label: '',
-    category: 'electricians',
+    category: 'Electrician',
     image: '/images/light-installation.png',
   },
   {
-    name: 'Wooden Door Repair',
+    name: 'Shrirang',
     quantity: 'Per Unit',
     price: 300,
     label: 'Popular',
-    category: 'carpentry',
+    category: 'plumbing',
     image: '/images/door-repair.png',
   },
   {
-    name: 'Floor Tiling',
+    name: 'Rushikesh',
     quantity: 'Per Sqft',
     price: 45,
     label: '',

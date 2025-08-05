@@ -6,14 +6,25 @@ const CategoryCard = ({ image, title }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const slug = encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'));
-    navigate(`/category/${slug}`);
+    if (title) {
+      const slug = encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'));
+      navigate(`/category/${slug}`);
+    } else {
+      console.error('Category title is undefined');
+    }
   };
 
   return (
-    <div className="category-card" onClick={handleClick} style={{ cursor: 'pointer' }}>
-      <img src={image} alt={title} />
-      <p>{title}</p>
+    <div
+      className="category-card"
+      onClick={title ? handleClick : null}
+      style={{
+        cursor: title ? 'pointer' : 'default',
+        opacity: title ? 1 : 0.6,
+      }}
+    >
+      <img src={image || '/placeholder.jpg'} alt={title || 'No Title'} />
+      <p>{title || 'Untitled'}</p>
     </div>
   );
 };

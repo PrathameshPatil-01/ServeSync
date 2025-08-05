@@ -1,31 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CategoryCard from './CategoryCard';
 import './CategoriesGrid.css';
-import Electrician from '../FirstPage/images/Electrician.jpg';
-import BuildingConstruction from '../FirstPage/images/building-construction.jpg';
-import Carpentry from '../FirstPage/images/Carpentry.jpg';
-import Ceilings from '../FirstPage/images/ceilings.jpg';
-import Flooring from '../FirstPage/images/flooring.jpg';
-import Plumbing from '../FirstPage/images/plumbing.jpg';
-import Cleaning from '../FirstPage/images/cleaning.jpg';
-import Appliance from '../FirstPage/images/appliance.jpg';
-
-
-
-
-const categories = [
-  { image: Electrician, title: 'Electricians' },
-  { image: BuildingConstruction, title: 'building-construction' },
-  { image: Carpentry, title: 'Carpentry' },
-  { image: Ceilings, title: 'ceilings' },
-  { image: Flooring, title: 'Flooring' },
-  { image: Plumbing, title: 'Plumbing' },
-  { image: Cleaning, title: 'Cleaning' },
-  { image: Appliance, title: 'Appliance Repair' },
-  // ...add more as needed
-];
+import { getAllCategories } from '../../api/categoryApi';
 
 const CategoriesGrid = () => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <section className="categories-section">
       <div className="categories-title-wrapper">
@@ -35,7 +28,15 @@ const CategoriesGrid = () => {
       </div>
       <div className="categories-grid">
         {categories.map((cat, idx) => (
-          <CategoryCard key={idx} image={cat.image} title={cat.title} />
+          <CategoryCard
+            key={idx}
+            image={
+              cat.imageBase64
+                ? `data:image/jpeg;base64,${cat.imageBase64}`
+                : '/default-category.jpg' // 👈 Add a default image in public folder
+            }
+            title={cat.serviceName}
+          />
         ))}
       </div>
     </section>
