@@ -7,10 +7,10 @@ import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../redux/auth/authThunks';
+import { login } from '../../../redux/customer/auth/customerAuthThunks'; // Adjust the import path as needed
 import { Link } from 'react-router-dom';
-import AuthLayout from '../../layouts/AuthLayout';
-import { clearAuthMessages } from '../../redux/auth/authSlice'; // create this action
+import AuthLayout from '../../../layouts/AuthLayout';
+import { clearAuthMessages } from '../../../redux/customer/auth/customerAuthSlice'; // Adjust the import path as needed
 
 
 
@@ -28,7 +28,7 @@ export default function LoginForm() {
   useEffect(() => {
     if (userId) {
       toast.success('Logged in successfully!');
-      navigate('/'); // redirect to home after login
+      navigate('/firstPage'); // redirect to home after login
     }
   }, [userId, navigate]);
 

@@ -1,13 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  loginUser,
-  signupUser,
-  forgotPassword,
-} from '../../services/authService';
+    forgotPassword,
+    loginUser,
+    signupUser,
+} from '../../../services/authService.js';
 
 // LOGIN THUNK
 export const login = createAsyncThunk(
-  'auth/login',
+  'customer/login',
   async (credentials, { rejectWithValue }) => {
     try {
       const userData = await loginUser(credentials);
@@ -20,7 +20,7 @@ export const login = createAsyncThunk(
 
 // REGISTER THUNK
 export const signup = createAsyncThunk(
-  'auth/register',
+  'customer/signup',
   async (userData, { rejectWithValue }) => {
     try {
       const result = await signupUser(userData);
@@ -33,7 +33,7 @@ export const signup = createAsyncThunk(
 
 // FORGOT PASSWORD THUNK
 export const requestPasswordReset = createAsyncThunk(
-  'auth/forgotPassword',
+  'customer/forgotPassword',
   async (email, { rejectWithValue }) => {
     try {
       const result = await forgotPassword(email);

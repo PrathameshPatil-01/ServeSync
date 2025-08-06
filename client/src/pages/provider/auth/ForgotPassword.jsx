@@ -1,19 +1,18 @@
-import React from 'react';
+import ProviderAuthLayout from '@/layouts/ProviderAuthLayout.jsx';
+import { clearAuthMessages } from '@/redux/provider/auth/providerAuthSlice.js'; // create this action
+import { requestPasswordReset } from '@/redux/provider/auth/providerAuthThunks'; // Adjust the import path as needed
 import {
   Box,
   Button,
+  Link as MuiLink,
   TextField,
-  Typography,
-  Link as MuiLink
+  Typography
 } from '@mui/material';
+import { Form, Formik } from 'formik';
 import { useEffect } from 'react';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { requestPasswordReset } from '../../redux/auth/authThunks';
-import AuthLayout from '../../layouts/AuthLayout';
-import { clearAuthMessages } from '../../redux/auth/authSlice'; // create this action
+import * as Yup from 'yup';
 
 const validationSchema = Yup.object({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -21,14 +20,14 @@ const validationSchema = Yup.object({
 
 export default function ForgotPasswordForm() {
   const dispatch = useDispatch();
-  const { loading, error, successMessage } = useSelector((state) => state.auth);
+  const { loading, error, successMessage } = useSelector((state) => state.providerAuth);
 
     useEffect(() => {
       dispatch(clearAuthMessages()); // Clear messages on component mount   
     }, [dispatch]);
 
   return (
-    <AuthLayout title="Forgot Password">
+    <ProviderAuthLayout title="Forgot Password">
       <Formik
         initialValues={{ email: '' }}
         validationSchema={validationSchema}
@@ -89,7 +88,7 @@ export default function ForgotPasswordForm() {
 
               <Typography variant="body2" align="center">
                 Remember your password?{' '}
-                <MuiLink component={Link} to="/auth/login" underline="hover">
+                <MuiLink component={Link} to="/provider/login" underline="hover">
                   Login
                 </MuiLink>
               </Typography>
@@ -97,6 +96,6 @@ export default function ForgotPasswordForm() {
           </Form>
         )}
       </Formik>
-    </AuthLayout>
+    </ProviderAuthLayout>
   );
 }

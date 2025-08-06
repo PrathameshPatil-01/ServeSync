@@ -11,9 +11,9 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import AuthLayout from '../../layouts/AuthLayout';
-import { clearAuthMessages, resetAuthState } from '../../redux/auth/authSlice';
-import { signup } from '../../redux/auth/authThunks';
+import AuthLayout from '../../../layouts/AuthLayout';
+import { clearAuthMessages, resetAuthState } from '../../../redux/customer/auth/customerAuthSlice.js';
+import { signup } from '../../../redux/customer/auth/customerAuthThunks.js';
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required('First name is required'),

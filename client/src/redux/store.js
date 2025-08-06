@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './auth/authSlice';
-import userReducer from './users/userSlice';
 import bookingReducer from './bookings/bookingSlice';
+import providerAuthReducer from './provider/auth/providerAuthSlice';
+import providerReducer from './provider/providerSlice';
+import searchReducer from './search/searchSlice';
 import serviceReducer from './services/serviceSlice';
-import searchReducer from './search/searchSlice'; 
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    users: userReducer,
+    providerAuth: providerAuthReducer,
+    provider: providerReducer,
     bookings: bookingReducer,
     services: serviceReducer,
     search: searchReducer, 

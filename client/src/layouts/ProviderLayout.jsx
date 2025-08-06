@@ -1,16 +1,13 @@
-// src/layouts/ProviderLayout.jsx
-import { Box, Typography } from '@mui/material';
+import { Outlet } from 'react-router-dom';
+import Sidebar from '@/components/provider/Sidebar.jsx';
+import { Box } from '@mui/material';
 
-export default function ProviderLayout({ children }) {
+export default function ProviderLayout() {
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Sidebar Placeholder */}
-      <Box sx={{ width: '220px', backgroundColor: '#f0f4f8', p: 2 }}>
-        <Typography variant="h6">Provider Panel</Typography>
-        {/* Add nav links here */}
-      </Box>
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        {children}
+    <Box display="flex">
+      <Sidebar />
+      <Box sx={{ flexGrow: 1, ml: '210px', p: 4 }}>
+        <Outlet />  {/* Nested routes will render here */}
       </Box>
     </Box>
   );
