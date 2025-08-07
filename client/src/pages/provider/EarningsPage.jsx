@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -10,71 +10,15 @@ import {
     Tabs,
     Tab,
     Divider,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
-
-// Dummy data for earnings cards
-const earningsData = [
-    {
-        title: "Today's Earnings",
-        amount: '₹2,450',
-        subtitle: '+18% from yesterday',
-        icon: '$',
-    },
-    {
-        title: 'This Week',
-        amount: '₹15,680',
-        subtitle: '+12% from last week',
-        icon: '📈',
-    },
-    {
-        title: 'This Month',
-        amount: '₹58,250',
-        subtitle: '+8% from last month',
-        icon: '📅',
-    },
-    {
-        title: 'Total Earnings',
-        amount: '₹2,84,500',
-        subtitle: 'All time earnings',
-        icon: '💳',
-    },
-];
-
-// Dummy recent transactions
-const recentTransactions = [
-    {
-        orderId: 'ORD-004',
-        customer: 'Vikram Singh',
-        service: 'Electrical Work',
-        time: 'Today, 4:30 PM',
-        status: 'completed',
-        earnings: 855,
-        total: 950,
-        commission: 95,
-    },
-    {
-        orderId: 'ORD-003',
-        customer: 'Sneha Patel',
-        service: 'Plumbing',
-        time: 'Today, 10:15 AM',
-        status: 'completed',
-        earnings: 540,
-        total: 600,
-        commission: 60,
-    },
-    {
-        orderId: 'ORD-002',
-        customer: 'Rajesh Kumar',
-        service: 'AC Repair',
-        time: 'Yesterday, 12:00 PM',
-        status: 'completed',
-        earnings: 1080,
-        total: 1200,
-        commission: 120,
-    },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchEarningsSummary, fetchTransactions, requestProviderPayout } from '@/redux/earnings/earningThunks';
+import { clearEarningError, clearPayoutSuccess } from '@/redux/earnings/earningSlice';
+import { toast } from 'react-toastify';
 
 // Earnings Card Component
 function EarningsCard({ title, amount, subtitle, icon }) {
@@ -85,7 +29,7 @@ function EarningsCard({ title, amount, subtitle, icon }) {
                     {title}
                 </Typography>
                 <Typography variant="h5" fontWeight="bold">
-                    {amount} <span style={{ fontSize: 18 }}>{icon}</span>
+                    ₹{amount.toLocaleString()} <span style={{ fontSize: 18 }}>{icon}</span>
                 </Typography>
                 <Typography variant="caption" color="success.main">
                     {subtitle}
@@ -98,9 +42,9 @@ function EarningsCard({ title, amount, subtitle, icon }) {
 // Single Transaction Item
 function TransactionItem({
     orderId,
-    customer,
-    service,
-    time,
+    customerName,
+    serviceName,
+    scheduledTime,
     status,
     earnings,
     total,
@@ -139,10 +83,10 @@ function TransactionItem({
                     </Box>
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {customer} • {service}
+                    {customerName} • {serviceName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                    {time}
+                    {new Date(scheduledTime).toLocaleString()}
                 </Typography>
             </Box>
 
@@ -182,11 +126,76 @@ function TabsNavigation({ value, onChange }) {
 
 // Main Earnings Page Component
 export default function EarningsPage() {
+    const dispatch = useDispatch();
+    const { userId } = useSelector((state) => state.providerAuth);
+    const { summary, transactions, loading, error, payoutSuccess } = useSelector((state) => state.earnings);
+
     const [tab, setTab] = useState('transactions');
+
+    useEffect(() => {
+        if (userId) {
+            dispatch(fetchEarningsSummary(userId));
+            dispatch(fetchTransactions({ providerId: userId }));
+        }
+    }, [dispatch, userId]);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+            dispatch(clearEarningError());
+        }
+        if (payoutSuccess) {
+            toast.success('Payout request submitted successfully!');
+            dispatch(clearPayoutSuccess());
+        }
+    }, [error, payoutSuccess, dispatch]);
 
     const handleTabChange = (event, newValue) => {
         setTab(newValue);
     };
+
+    const handleRequestPayout = () => {
+        // Example: Request payout of all available earnings
+        if (userId && summary.totalEarnings > 0) {
+            dispatch(requestProviderPayout({ providerId: userId, amount: summary.totalEarnings }))
+                .unwrap()
+                .then(() => {
+                    // Re-fetch summary and transactions after successful payout request
+                    dispatch(fetchEarningsSummary(userId));
+                    dispatch(fetchTransactions({ providerId: userId }));
+                })
+                .catch(() => {}); // Error handled by useEffect
+        } else {
+            toast.info('No earnings to request payout for.');
+        }
+    };
+
+    const earningsData = [
+        {
+            title: "Today's Earnings",
+            amount: summary.todayEarnings,
+            subtitle: '+18% from yesterday', // This would need actual comparison logic
+            icon: '₹',
+        },
+        {
+            title: 'This Week',
+            amount: summary.weekEarnings,
+            subtitle: '+12% from last week', // This would need actual comparison logic
+            icon: '📈',
+        },
+        {
+            title: 'This Month',
+            amount: summary.monthEarnings,
+            subtitle: '+8% from last month', // This would need actual comparison logic
+            icon: '📅',
+        },
+        {
+            title: 'Total Earnings',
+            amount: summary.totalEarnings,
+            subtitle: 'All time earnings',
+            icon: '💳',
+        },
+    ];
 
     return (
         <Box sx={{ p: 3, bgcolor: '#f7f7fb', minHeight: '100vh' }}>
@@ -212,6 +221,8 @@ export default function EarningsPage() {
                         variant="contained"
                         startIcon={<RequestQuoteIcon />}
                         sx={{ textTransform: 'none' }}
+                        onClick={handleRequestPayout}
+                        disabled={loading || summary.totalEarnings <= 0}
                     >
                         Request Payout
                     </Button>
@@ -219,18 +230,24 @@ export default function EarningsPage() {
             </Stack>
 
             {/* Earnings summary cards */}
-            <Grid container spacing={2} mb={3}>
-                {earningsData.map(({ title, amount, subtitle, icon }) => (
-                    <Grid item key={title}>
-                        <EarningsCard
-                            title={title}
-                            amount={amount}
-                            subtitle={subtitle}
-                            icon={icon}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Grid container spacing={2} mb={3}>
+                    {earningsData.map(({ title, amount, subtitle, icon }) => (
+                        <Grid item key={title}>
+                            <EarningsCard
+                                title={title}
+                                amount={amount}
+                                subtitle={subtitle}
+                                icon={icon}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
 
             <Divider sx={{ mb: 2 }} />
 
@@ -238,38 +255,51 @@ export default function EarningsPage() {
             <TabsNavigation value={tab} onChange={handleTabChange} />
 
             {/* Tab content */}
-            {tab === 'transactions' && (
-                <Box>
-                    <Typography variant="h6" fontWeight="bold" mb={2}>
-                        Recent Transactions
-                    </Typography>
-
-                    {recentTransactions.map((txn) => (
-                        <TransactionItem key={txn.orderId} {...txn} />
-                    ))}
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress />
                 </Box>
-            )}
+            ) : (
+                <>
+                    {tab === 'transactions' && (
+                        <Box>
+                            <Typography variant="h6" fontWeight="bold" mb={2}>
+                                Recent Transactions
+                            </Typography>
+                            {transactions.length === 0 ? (
+                                <Typography color="text.secondary" mt={2}>
+                                    No recent transactions available.
+                                </Typography>
+                            ) : (
+                                transactions.map((txn) => (
+                                    <TransactionItem key={txn.id} {...txn} />
+                                ))
+                            )}
+                        </Box>
+                    )}
 
-            {tab === 'payouts' && (
-                <Box>
-                    <Typography variant="h6" fontWeight="bold">
-                        Payout History
-                    </Typography>
-                    <Typography color="text.secondary" mt={2}>
-                        No payout history available yet.
-                    </Typography>
-                </Box>
-            )}
+                    {tab === 'payouts' && (
+                        <Box>
+                            <Typography variant="h6" fontWeight="bold">
+                                Payout History
+                            </Typography>
+                            <Typography color="text.secondary" mt={2}>
+                                No payout history available yet. (Implement fetching payout history here)
+                            </Typography>
+                        </Box>
+                    )}
 
-            {tab === 'analytics' && (
-                <Box>
-                    <Typography variant="h6" fontWeight="bold">
-                        Analytics
-                    </Typography>
-                    <Typography color="text.secondary" mt={2}>
-                        Analytics content will be shown here.
-                    </Typography>
-                </Box>
+                    {tab === 'analytics' && (
+                        <Box>
+                            <Typography variant="h6" fontWeight="bold">
+                                Analytics
+                            </Typography>
+                            <Typography color="text.secondary" mt={2}>
+                                Analytics content will be shown here. (Implement charts/graphs for earnings)
+                            </Typography>
+                        </Box>
+                    )}
+                </>
             )}
         </Box>
     );

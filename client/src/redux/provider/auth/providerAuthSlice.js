@@ -76,7 +76,7 @@ const providerAuthSlice = createSlice({
     extraReducers: (builder) => {
         builder
 
-            // ✅ Handle successful login
+            //  Handle successful login
             .addCase(login.fulfilled, (state, action) => {
                 const payload = action.payload;
 
@@ -102,7 +102,7 @@ const providerAuthSlice = createSlice({
                 state.version = payload.version || null;
             })
 
-            // ✅ Handle successful signup
+            // Handle successful signup
             .addCase(signup.fulfilled, (state) => {
                 state.loading = false;
                 state.signupSuccess = true;

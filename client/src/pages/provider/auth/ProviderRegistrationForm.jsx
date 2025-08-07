@@ -1,5 +1,5 @@
 import ProviderAuthLayout from '@/layouts/ProviderAuthLayout.jsx';
-import { registerProvider } from '@/redux/provider/providerThunks';
+import { registerProvider, fetchProvider } from '@/redux/provider/providerThunks';
 import {
     Box,
     Button,
@@ -14,6 +14,7 @@ import {
     Stepper,
     TextField,
     Typography,
+    CircularProgress
 } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,7 +24,6 @@ import * as Yup from 'yup';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-// Shared field component to reduce boilerplate
 function TextFieldWrapper({ name, label, type = 'text', formikProps, ...rest }) {
     const { values, handleChange, handleBlur, touched, errors } = formikProps;
     return (
@@ -75,7 +75,6 @@ function MultiSelectDays({ formikProps }) {
     );
 }
 
-// Validation
 const fullSchema = Yup.object({
     businessName: Yup.string().required('Business name is required'),
     fullName: Yup.string().required('Full name is required'),
@@ -90,9 +89,7 @@ const fullSchema = Yup.object({
     availableTimeEnd: Yup.string().required('Required'),
 });
 
-// Step-specific schemas for gating
 const stepSchemas = [
-    // Step 0: Business + Personal
     Yup.object({
         businessName: fullSchema.fields.businessName,
         fullName: fullSchema.fields.fullName,
@@ -100,7 +97,6 @@ const stepSchemas = [
         panNumber: fullSchema.fields.panNumber,
         gstNumber: fullSchema.fields.gstNumber,
     }),
-    // Step 1: Bio / Experience / Availability
     Yup.object({
         bio: fullSchema.fields.bio,
         yearsOfExperience: fullSchema.fields.yearsOfExperience,
@@ -113,38 +109,52 @@ const stepSchemas = [
 
 const steps = ['Business & Identity', 'Experience & Availability'];
 
-export default function ProviderUpdationForm() {
+export default function ProviderRegistrationForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, success, error } = useSelector((state) => state.provider);
+    const { userId } = useSelector((state) => state.providerAuth);
+    console.log('ProviderRegistrationForm userId:', userId);
     const [activeStep, setActiveStep] = useState(0);
+    const [checkingRegistration, setCheckingRegistration] = useState(true);
 
     useEffect(() => {
-        if (success) navigate('/dashboard');
+        if (userId) {
+            dispatch(fetchProvider(userId))
+                .unwrap()
+                .then(() => {
+                    // Provider is already registered
+                    navigate('/provider/dashboard');
+                })
+                .catch(() => {
+                    // Provider needs to register
+                    setCheckingRegistration(false);
+                });
+        }
+    }, [dispatch, navigate, userId]);
+
+    useEffect(() => {
+        if (success) navigate('/provider/dashboard');
     }, [success, navigate]);
 
     const isLastStep = activeStep === steps.length - 1;
 
-    const initialValues = useMemo(
-        () => ({
-            businessName: '',
-            fullName: '',
-            aadharNumber: '',
-            panNumber: '',
-            gstNumber: '',
-            bio: '',
-            yearsOfExperience: 0,
-            serviceAreaRadiusKm: 10,
-            availableDays: [],
-            availableTimeStart: '',
-            availableTimeEnd: '',
-        }),
-        []
-    );
+    const initialValues = useMemo(() => ({
+        businessName: '',
+        fullName: '',
+        aadharNumber: '',
+        panNumber: '',
+        gstNumber: '',
+        bio: '',
+        yearsOfExperience: 0,
+        serviceAreaRadiusKm: 10,
+        availableDays: [],
+        availableTimeStart: '',
+        availableTimeEnd: '',
+    }), []);
 
     const handleNext = useCallback(async (validateForm, setTouched) => {
         const errors = await validateForm();
-        // mark current step fields as touched to show errors
         const fieldsInStep = Object.keys(stepSchemas[activeStep].fields);
         setTouched(
             fieldsInStep.reduce((acc, key) => {
@@ -156,13 +166,17 @@ export default function ProviderUpdationForm() {
         if (!hasError) setActiveStep((s) => s + 1);
     }, [activeStep]);
 
+    if (checkingRegistration) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                <CircularProgress />
+            </Box>
+        );
+    }
+
     return (
         <ProviderAuthLayout title="Register as a Provider">
             <Box maxWidth={700} mx="auto" px={2}>
-                {/* <Typography variant="h5" mb={2}>
-          Register as a Provider
-        </Typography> */}
-
                 <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
                     {steps.map((label) => (
                         <Step key={label}>
@@ -176,8 +190,11 @@ export default function ProviderUpdationForm() {
                     validationSchema={fullSchema}
                     onSubmit={async (values, { setSubmitting }) => {
                         try {
-                            await dispatch(registerProvider(values)).unwrap();
-                            // navigation handled in useEffect
+                            const transformedValues = {
+                                ...values,
+                                availableDays: values.availableDays.join(','), // 👈 convert array to comma-separated string
+                            };
+                            await dispatch(registerProvider(transformedValues)).unwrap();
                         } catch {
                             // error displayed from redux state
                         } finally {
@@ -192,9 +209,6 @@ export default function ProviderUpdationForm() {
                             isSubmitting,
                             handleSubmit,
                         } = formik;
-
-                        // Determine if current step is valid (optional: to enable/disable next)
-                        {/* const currentStepSchema = stepSchemas[activeStep]; */ }
 
                         return (
                             <Form noValidate onSubmit={handleSubmit}>

@@ -1,7 +1,7 @@
 import { Box, Typography, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
-export default function WorkingHoursDay({ day, hours }) {
+export default function WorkingHoursDay({ day, hours, onEdit }) {
     return (
         <Box
             sx={{
@@ -18,7 +18,7 @@ export default function WorkingHoursDay({ day, hours }) {
             <Typography variant="body2" fontWeight="bold">{day}</Typography>
             <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body2">{hours}</Typography>
-                <IconButton size="small"><EditIcon fontSize="small" /></IconButton>
+                <IconButton size="small" onClick={() => onEdit(day, hours)}><EditIcon fontSize="small" /></IconButton>
             </Box>
         </Box>
     );

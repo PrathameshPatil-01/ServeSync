@@ -6,11 +6,12 @@ const getStatusColor = (status) => {
         case 'confirmed': return 'success';
         case 'pending': return 'warning';
         case 'available': return 'default';
+        case 'blocked': return 'error'; // Added blocked status
         default: return 'primary';
     }
 };
 
-export default function ScheduleSlot({ slot }) {
+export default function ScheduleSlot({ slot, onEdit }) {
     return (
         <Box
             sx={{
@@ -26,17 +27,20 @@ export default function ScheduleSlot({ slot }) {
         >
             <Box>
                 <Typography variant="body1" fontWeight="bold">
-                    {slot.time}
+                    {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Typography>
-                {slot.customer && (
+                {slot.customerName && (
                     <>
-                        <Typography variant="body2">{slot.customer}</Typography>
+                        <Typography variant="body2">{slot.customerName}</Typography>
                         <Typography variant="body2" color="text.secondary">{slot.location}</Typography>
-                        <Typography variant="body2" color="primary">{slot.service}</Typography>
+                        <Typography variant="body2" color="primary">{slot.serviceName}</Typography>
                     </>
                 )}
-                {!slot.customer && (
+                {!slot.customerName && slot.status === 'available' && (
                     <Typography variant="body2" color="success.main">Free Slot</Typography>
+                )}
+                 {!slot.customerName && slot.status === 'blocked' && (
+                    <Typography variant="body2" color="error.main">Blocked Slot</Typography>
                 )}
             </Box>
 
@@ -47,7 +51,7 @@ export default function ScheduleSlot({ slot }) {
                     size="small"
                     sx={{ textTransform: 'capitalize' }}
                 />
-                <IconButton size="small">
+                <IconButton size="small" onClick={() => onEdit(slot)}>
                     <EditIcon fontSize="small" />
                 </IconButton>
             </Box>

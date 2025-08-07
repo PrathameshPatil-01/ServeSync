@@ -23,8 +23,14 @@ import MessageIcon from '@mui/icons-material/Message';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
+import WorkIcon from '@mui/icons-material/Work'; // For services
+import StarIcon from '@mui/icons-material/Star'; // For reviews
+
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout as logoutProviderAuth } from '@/redux/provider/auth/providerAuthSlice';
+
 
 // Navigation items
 const navItems = [
@@ -32,13 +38,15 @@ const navItems = [
     { label: 'Orders', icon: <ListAltIcon />, to: '/provider/orders' },
     { label: 'Schedule', icon: <EventIcon />, to: '/provider/schedule' },
     { label: 'Earnings', icon: <MonetizationOnIcon />, to: '/provider/earnings' },
+    { label: 'Services', icon: <WorkIcon />, to: '/provider/services' }, // New
+    { label: 'Reviews', icon: <StarIcon />, to: '/provider/reviews' }, // New
 ];
 
 // Account menu items except Logout
 const accountItems = [
-    { label: 'Profile', icon: <PersonIcon />, to: '/profile' },
-    { label: 'Messages', icon: <MessageIcon />, to: '/messages' },
-    { label: 'Settings', icon: <SettingsIcon />, to: '/settings' },
+    { label: 'Profile', icon: <PersonIcon />, to: '/provider/profile' }, // Updated path
+    { label: 'Messages', icon: <MessageIcon />, to: '/provider/messages' }, // New/Updated path
+    { label: 'Settings', icon: <SettingsIcon />, to: '/provider/settings' }, // Updated path
 ];
 
 // Logout item separated
@@ -72,6 +80,7 @@ function MenuItemLink({ to, icon, label, selected, onClick, sx, dense = false })
 export default function Sidebar() {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
     // Open logout confirmation dialog
@@ -87,10 +96,8 @@ export default function Sidebar() {
     // Perform logout action (example: clear auth, redirect)
     const handleLogoutConfirm = () => {
         setLogoutDialogOpen(false);
-        // TODO: Add your logout logic here, e.g. clear tokens, call API, etc.
-
-        // Redirect to login page after logout
-        navigate('/login', { replace: true });
+        dispatch(logoutProviderAuth()); // Dispatch the logout action
+        navigate('/provider/login', { replace: true }); // Redirect to login page after logout
     };
 
     return (
@@ -112,7 +119,7 @@ export default function Sidebar() {
                 }}
             >
                 <Typography variant="h6" gutterBottom sx={{ mb: 4, userSelect: 'text' }}>
-                    ServicePro
+                    ServeSync
                 </Typography>
 
                 {/* Main Navigation */}

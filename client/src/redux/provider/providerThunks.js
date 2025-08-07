@@ -3,6 +3,7 @@ import {
   registerProvider as registerProviderService,
   fetchProvider as fetchProviderService,
   updateProvider as updateProviderService,
+  fetchProviderDashboardStats,
 } from '@/services/providerService.js';
 
 export const registerProvider = createAsyncThunk(
@@ -37,6 +38,18 @@ export const updateProvider = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(error.message || 'Updating provider failed');
+    }
+  }
+);
+
+export const fetchDashboardStats = createAsyncThunk(
+  'provider/fetchDashboardStats',
+  async (providerId, { rejectWithValue }) => {
+    try {
+      const response = await fetchProviderDashboardStats(providerId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to fetch dashboard stats');
     }
   }
 );

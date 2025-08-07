@@ -26,7 +26,7 @@ export default function LoginForm() {
   useEffect(() => {
     if (userId) {
       toast.success('Logged in successfully!');
-      navigate('/provider/update');
+      navigate('/provider/register');
     }
   }, [userId, navigate]);
 
