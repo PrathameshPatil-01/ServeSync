@@ -3,8 +3,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
 // Async Thunks
-export const signup = createAsyncThunk(
-  'provider/signup',
+export const registerProvider = createAsyncThunk(
+  'providerAuth/register',
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/users/register', { ...userData, role: 'ROLE_PROVIDER' });
@@ -18,8 +18,8 @@ export const signup = createAsyncThunk(
   }
 );
 
-export const login = createAsyncThunk(
-  'provider/login',
+export const loginProvider = createAsyncThunk(
+  'providerAuth/login',
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/users/login', credentials);
@@ -40,21 +40,6 @@ export const login = createAsyncThunk(
   }
 );
 
-export const forgotPassword = createAsyncThunk(
-  'provider/forgotPassword',
-  async (email, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post('/users/forgot-password', { email });
-      toast.success('Password reset link sent to your email.');
-      return response.data.message;
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Failed to send reset link';
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
-
 // Slice
 const providerAuthSlice = createSlice({
   name: 'providerAuth',
@@ -66,7 +51,6 @@ const providerAuthSlice = createSlice({
     loading: false,
     error: null,
     isAuthenticated: !!localStorage.getItem('token'),
-    setsignupSuccess: false, // Added for signup success state
   },
   reducers: {
     logout: (state) => {
@@ -84,46 +68,26 @@ const providerAuthSlice = createSlice({
     clearAuthError: (state) => {
       state.error = null;
     },
-    clearAuthMessages: (state) => {
-      state.error = null;
-      state.loading = false;
-    },
-    resetAuthState: (state) => {
-      state.token = null;
-      state.userId = null;
-      state.providerId = null; // Reset providerId
-      state.roles = [];
-      state.isAuthenticated = false;
-      state.loading = false;
-      state.error = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('providerId'); // Remove from local storage
-      localStorage.removeItem('roles');
-    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signup.pending, (state) => {
+      .addCase(registerProvider.pending, (state) => {
         state.loading = true;
         state.error = null;
-
       })
-      .addCase(signup.fulfilled, (state) => {
+      .addCase(registerProvider.fulfilled, (state) => {
         state.loading = false;
-        state.signupSuccess = true; // Set signup success state
-        state.error = null;
         // No token or auth status update on register, user needs to login
       })
-      .addCase(signup.rejected, (state, action) => {
+      .addCase(registerProvider.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(login.pending, (state) => {
+      .addCase(loginProvider.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(loginProvider.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
         state.userId = action.payload.userId;
@@ -131,7 +95,7 @@ const providerAuthSlice = createSlice({
         state.roles = action.payload.roles;
         state.isAuthenticated = true;
       })
-      .addCase(login.rejected, (state, action) => {
+      .addCase(loginProvider.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.isAuthenticated = false;
@@ -143,7 +107,7 @@ const providerAuthSlice = createSlice({
   },
 });
 
-export const { logout, clearAuthError, clearAuthMessages , resetAuthState } = providerAuthSlice.actions;
+export const { logout, clearAuthError } = providerAuthSlice.actions;
 
 export default providerAuthSlice.reducer;
 
