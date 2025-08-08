@@ -11,9 +11,10 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import AuthLayout from '../../../layouts/AuthLayout';
-import { clearAuthMessages, resetAuthState } from '../../../redux/customer/auth/customerAuthSlice.js';
-import { signup } from '../../../redux/customer/auth/customerAuthThunks.js';
+import AuthLayout from '@/layouts/AuthLayout';
+import { clearAuthMessages, resetAuthState } from '@/redux/customer/auth/customerAuthSlice.js';
+import { signup } from '@/redux/customer/auth/customerAuthThunks.js';
+
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required('First name is required'),
@@ -30,7 +31,7 @@ const validationSchema = Yup.object({
 
 export default function SignupForm() {
   const dispatch = useDispatch();
-  const { signupSuccess, loading, error } = useSelector((state) => state.auth);
+  const { signupSuccess, loading, error } = useSelector((state) => state.customerAuth);
   const navigate = useNavigate();
 
   // ✅ Clear messages when component mounts
@@ -41,7 +42,7 @@ export default function SignupForm() {
   // ✅ Redirect after successful signup
   useEffect(() => {
     if (signupSuccess) {
-      navigate('/auth/login');
+      navigate('/customer/login');
       dispatch(resetAuthState()); // Reset flag after redirect
     }
   }, [signupSuccess, navigate, dispatch]);
@@ -56,7 +57,7 @@ export default function SignupForm() {
           phoneNumber: '',
           password: '',
           confirmPassword: '',
-          role: 'ROLE_PROVIDER',
+          role: 'ROLE_CUSTOMER',
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {

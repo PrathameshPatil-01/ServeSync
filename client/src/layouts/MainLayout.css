@@ -1,0 +1,9 @@
+.main-content {
+  padding-top: 64px; /* Matches navbar height */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers horizontally */
+  justify-content: flex-start;
+  min-height: 100vh;
+  box-sizing: border-box;
+}

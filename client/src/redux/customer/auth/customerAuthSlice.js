@@ -30,7 +30,7 @@ const initialState = {
 };
 
 const customerAuthSlice = createSlice({
-    name: 'auth',
+    name: 'customerAuth',
     initialState,
 
     reducers: {

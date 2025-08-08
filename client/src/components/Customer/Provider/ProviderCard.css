@@ -1,0 +1,99 @@
+.provider-card {
+  min-width: 1300px;
+  min-height: 500px;
+  margin: 40px auto;
+  display: flex;
+  background-color: #f3f4f6; /* Light gray */
+  border-radius: 24px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.provider-card__image-wrapper {
+  flex: 1;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.provider-card__image {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.provider-card__details {
+  flex: 2;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.provider-card__name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.provider-card__skill {
+  font-size: 22px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.provider-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 32px;
+}
+
+.provider-card__description h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.provider-card__description p {
+  font-size: 16px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.provider-card__action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.provider-card__price {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.provider-card__book-btn {
+  background-color: #f87171;
+  color: #fff;
+  padding: 14px 28px;
+  font-size: 16px;
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.provider-card__book-btn:hover {
+  background-color: #ef4444;
+}

@@ -1,0 +1,106 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: white;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.by-zomato {
+  font-size: 0.65rem;
+  color: #666;
+  font-weight: 600;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.location {
+  display: flex;
+  flex-direction: column;
+}
+
+.delivery-label {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.location-btn {
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111;
+  cursor: pointer;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  font-weight: 500;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #111;
+  position: relative;
+}
+
+.new-badge {
+  font-size: 0.6rem;
+  color: red;
+  font-weight: bold;
+  margin-left: 4px;
+  vertical-align: super;
+}
+
+
+
+.login-btn {
+  background-color: #f0444c;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.servsync-logo {
+  height: 36px;
+  object-fit: contain;
+}
+.login-btn.large {
+  padding: 0.9rem 1.4rem;   /* taller height, slightly reduced width */
+  font-size: 1rem;
+  border-radius: 14px;
+  background-color: #f0444c;
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+

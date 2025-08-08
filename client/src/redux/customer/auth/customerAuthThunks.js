@@ -3,7 +3,7 @@ import {
     forgotPassword,
     loginUser,
     signupUser,
-} from '../../../services/authService.js';
+} from '@/services/authService';
 
 // LOGIN THUNK
 export const login = createAsyncThunk(

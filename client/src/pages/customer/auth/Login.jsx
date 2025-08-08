@@ -7,10 +7,10 @@ import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../../redux/customer/auth/customerAuthThunks'; // Adjust the import path as needed
+import { login } from '@/redux/customer/auth/customerAuthThunks';
 import { Link } from 'react-router-dom';
-import AuthLayout from '../../../layouts/AuthLayout';
-import { clearAuthMessages } from '../../../redux/customer/auth/customerAuthSlice'; // Adjust the import path as needed
+import AuthLayout from '@/layouts/AuthLayout';
+import { clearAuthMessages } from '@/redux/customer/auth/customerAuthSlice';
 
 
 
@@ -21,14 +21,14 @@ const validationSchema = Yup.object({
 
 export default function LoginForm() {
   const dispatch = useDispatch();
-  const { userId, loading, error } = useSelector((state) => state.auth);
+  const { userId, loading, error } = useSelector((state) => state.customerAuth);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (userId) {
       toast.success('Logged in successfully!');
-      navigate('/firstPage'); // redirect to home after login
+      navigate('/customer/firstPage'); // redirect to home after login
     }
   }, [userId, navigate]);
 
@@ -89,7 +89,7 @@ export default function LoginForm() {
 
               <Typography variant="body2" align="center">
                 Don&apos;t have an account?{' '}
-                <MuiLink component={Link} to="/auth/signup" underline="hover">
+                <MuiLink component={Link} to="/customer/signup" underline="hover">
                   Sign Up
                 </MuiLink>
               </Typography>

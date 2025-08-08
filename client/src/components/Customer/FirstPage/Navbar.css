@@ -1,0 +1,75 @@
+/* Navbar */
+.classy-navbar {
+
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+/* Navigation Links */
+.classy-link {
+  color: #212529;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.classy-link:hover {
+  color: #0d6efd;
+}
+
+/* Input Groups */
+.classy-input {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+}
+
+/* Icons inside input */
+.classy-icon {
+  background-color: #e9ecef;
+  border: none;
+  font-size: 1rem;
+  color: #495057;
+}
+
+/* Input Fields */
+.classy-field {
+  background-color: #ffffff;
+  border: none;
+  color: #212529;
+  font-size: 0.95rem;
+  padding-left: 10px;
+}
+
+.classy-field:focus {
+  outline: none;
+  background-color: #f1f3f5;
+  box-shadow: none;
+}
+
+/* Cart & Profile Icons */
+.classy-icon-btn {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+  color: #343a40;
+}
+
+.classy-icon-btn:hover {
+  transform: scale(1.1);
+  color: #0d6efd;
+}
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  z-index: 1000; /* must be less than sidebar */
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

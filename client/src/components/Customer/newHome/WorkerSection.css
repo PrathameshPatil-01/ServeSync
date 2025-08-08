@@ -1,0 +1,104 @@
+.worker-section-outer {
+  
+  padding: 5rem 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.worker-section {
+  width: 85vw;
+  max-width: 1600px;
+  background: #ffffff;
+  padding: 3rem;
+  border-radius: 36px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.worker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.worker-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.worker-heading h2 {
+  font-size: 2rem;
+  margin: 0;
+  color: #b13535;
+}
+
+.worker-heading p {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.see-all {
+  color: #b13535;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.worker-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+.worker-card {
+  flex: 0 0 auto;
+  width: 240px;
+  background: white;
+  border-radius: 24px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+  margin-right: 2rem; /* space between cards */
+}
+
+.worker-card:last-child {
+  margin-right: 0; /* no margin on last card */
+}
+
+
+.worker-card:hover {
+  transform: translateY(-5px);
+}
+
+.worker-card img {
+  max-height: 80px;
+  margin-bottom: 1rem;
+}
+
+.worker-card-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #333;
+}
+
+.worker-card-btn {
+  margin-top: 1rem;
+  background: #b13535;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.worker-card-btn:hover {
+  background: #921f1f;
+}

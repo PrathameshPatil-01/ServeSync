@@ -1,0 +1,86 @@
+/* Sidebar Container */
+.category-sidebar {
+  width: 250px;
+  background-color: #f1f1f1;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px; /* Rounded corners for the whole sidebar */
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 20px;
+}
+
+/* Optional: Hide scrollbar in Chrome/Safari but keep scrollable */
+.category-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+/* Sidebar Items */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  margin: 2px 8px;
+}
+
+/* Hover Effect */
+.sidebar-item:hover {
+  background-color: #eaeaea;
+}
+
+/* Active Item Highlight */
+.sidebar-item.active {
+  background-color: #fdeef0;
+}
+
+/* Active Indicator Bar */
+.sidebar-item.active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10px;
+  height: calc(100% - 20px);
+  width: 5px;
+  background-color: #e63946;
+  border-radius: 10px 0 0 10px;
+}
+
+/* Icon Circle */
+.icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Icon Image */
+.category-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* Title Text */
+.category-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.2;
+  white-space: nowrap;
+}

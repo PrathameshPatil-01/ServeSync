@@ -1,0 +1,17 @@
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* or center if you want vertical centering */
+  width: 100%;
+  max-width: 1200px; /* Optional for layout control */
+  margin: 0 auto; /* This centers the wrapper itself */
+  padding: 2rem;
+  box-sizing: border-box;
+}
+/* Example inside RoleCards.css or ScrollingCardRow.css */
+.component-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}

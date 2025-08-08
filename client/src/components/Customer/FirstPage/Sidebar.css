@@ -1,0 +1,177 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 300px;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1050; /* must be greater than navbar's z-index */
+  padding-top: 20px; /* optional: adjust if you want spacing inside */
+  overflow-y: auto;
+}
+
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* === Background Blur Overlay === */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* === Close Button === */
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+}
+
+/* === Profile Section === */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.sidebar-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sidebar-sub {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 0;
+}
+
+/* === Section Containers === */
+.sidebar-section {
+  background: #f6f6f6;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+/* === Section Titles === */
+.sidebar-section-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.red-left {
+  border-left: 4px solid #ef4444;
+  padding-left: 0.5rem;
+}
+
+/* === Sidebar Item === */
+.sidebar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.45rem 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.sidebar-item:hover {
+  color: #ef4444;
+}
+
+.sidebar-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* === Wallet Badge and Arrows === */
+.sidebar-wallet-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wallet-badge {
+  background-color: #dcfce7;
+  color: #16a34a;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.arrow-icon {
+  color: #aaa;
+}
+
+/* === Logout Button Styling === */
+.sidebar-logout {
+  margin-top: auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.logout-btn {
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1049; /* one less than sidebar */
+}
