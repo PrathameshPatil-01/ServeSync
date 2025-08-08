@@ -1,142 +1,149 @@
-import { createSlice, isRejected } from '@reduxjs/toolkit';
-import { login, requestPasswordReset, signup } from './providerAuthThunks';
+import axiosInstance from '@/api/axios';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 
-const asyncActions = [login, signup, requestPasswordReset];
+// Async Thunks
+export const signup = createAsyncThunk(
+  'provider/signup',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/users/register', { ...userData, role: 'ROLE_PROVIDER' });
+      toast.success('Registration successful! Please login.');
+      return response.data;
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Registration failed';
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
 
-// Initial global auth state
-const initialState = {
-    // User Auth Data
+export const login = createAsyncThunk(
+  'provider/login',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/users/login', credentials);
+      const { token, userId, roles, providerId } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('roles', JSON.stringify(roles));
+      if (providerId) {
+        localStorage.setItem('providerId', providerId);
+      }
+      toast.success('Login successful!');
+      return { token, userId, roles, providerId };
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Login failed';
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const forgotPassword = createAsyncThunk(
+  'provider/forgotPassword',
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/users/forgot-password', { email });
+      toast.success('Password reset link sent to your email.');
+      return response.data.message;
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to send reset link';
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// Slice
+const providerAuthSlice = createSlice({
+  name: 'providerAuth',
+  initialState: {
     token: localStorage.getItem('token') || null,
-    userId: null,
-
-    // User Profile Info
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    profilePic: '',
-    roles: [],
-
-    // Base Metadata
-    isDeleted: false,
-    createdAt: null,
-    updatedAt: null,
-    version: null,
-
-    // UI State
+    userId: localStorage.getItem('userId') || null,
+    providerId: localStorage.getItem('providerId') || null, // Added providerId
+    roles: localStorage.getItem('roles') ? JSON.parse(localStorage.getItem('roles')) : [],
     loading: false,
     error: null,
-    signupSuccess: false,
-};
-
-const providerAuthSlice = createSlice({
-    name: 'providerAuth',
-    initialState,
-
-    reducers: {
-        /**
-         * Clears transient messages and resets loading.
-         */
-        clearAuthMessages: (state) => {
-            state.error = null;
-            state.signupSuccess = false;
-            state.loading = false;
-        },
-
-        /**
-         * Logs out the user and clears all auth data.
-         */
-        logout: (state) => {
-            state.token = null;
-            state.userId = null;
-
-            state.firstName = '';
-            state.lastName = '';
-            state.email = '';
-            state.phoneNumber = '';
-            state.profilePic = '';
-            state.roles = [];
-
-            state.isDeleted = false;
-            state.createdAt = null;
-            state.updatedAt = null;
-            state.version = null;
-
-            localStorage.removeItem('token');
-        },
-
-        /**
-         * Resets only the signup success state.
-         */
-        resetAuthState: (state) => {
-            state.signupSuccess = false;
-        },
+    isAuthenticated: !!localStorage.getItem('token'),
+    setsignupSuccess: false, // Added for signup success state
+  },
+  reducers: {
+    logout: (state) => {
+      state.token = null;
+      state.userId = null;
+      state.providerId = null; // Clear providerId on logout
+      state.roles = [];
+      state.isAuthenticated = false;
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('providerId'); // Remove from local storage
+      localStorage.removeItem('roles');
+      toast.info('Logged out successfully.');
     },
-
-    extraReducers: (builder) => {
-        builder
-
-            //  Handle successful login
-            .addCase(login.fulfilled, (state, action) => {
-                const payload = action.payload;
-
-                state.loading = false;
-
-                // Auth data
-                state.token = payload.token || null;
-                localStorage.setItem('token', payload.token || '');
-
-                // User data
-                state.userId = payload.userId || null;
-                state.firstName = payload.firstName || '';
-                state.lastName = payload.lastName || '';
-                state.email = payload.email || '';
-                state.phoneNumber = payload.phoneNumber || '';
-                state.profilePic = payload.profilePic || '';
-                state.roles = payload.roles || [];
-
-                // Metadata
-                state.isDeleted = payload.isDeleted || false;
-                state.createdAt = payload.createdAt || null;
-                state.updatedAt = payload.updatedAt || null;
-                state.version = payload.version || null;
-            })
-
-            // Handle successful signup
-            .addCase(signup.fulfilled, (state) => {
-                state.loading = false;
-                state.signupSuccess = true;
-            })
-
-            // ✅ Handle successful password reset request
-            .addCase(requestPasswordReset.fulfilled, (state) => {
-                state.loading = false;
-            })
-
-            // ✅ Handle all .pending actions
-            .addMatcher(
-                (action) =>
-                    asyncActions.some((thunk) => thunk.pending.match(action)),
-                (state) => {
-                    state.loading = true;
-                    state.error = null;
-                    state.signupSuccess = false;
-                }
-            )
-
-            // ✅ Handle all .rejected actions
-            .addMatcher(isRejected, (state, action) => {
-                state.loading = false;
-                state.error =
-                    action.payload?.message ||
-                    action.payload ||
-                    'Something went wrong';
-            });
+    clearAuthError: (state) => {
+      state.error = null;
     },
+    clearAuthMessages: (state) => {
+      state.error = null;
+      state.loading = false;
+    },
+    resetAuthState: (state) => {
+      state.token = null;
+      state.userId = null;
+      state.providerId = null; // Reset providerId
+      state.roles = [];
+      state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('providerId'); // Remove from local storage
+      localStorage.removeItem('roles');
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(signup.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+
+      })
+      .addCase(signup.fulfilled, (state) => {
+        state.loading = false;
+        state.signupSuccess = true; // Set signup success state
+        state.error = null;
+        // No token or auth status update on register, user needs to login
+      })
+      .addCase(signup.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.userId = action.payload.userId;
+        state.providerId = action.payload.providerId; // Set providerId
+        state.roles = action.payload.roles;
+        state.isAuthenticated = true;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+        state.token = null;
+        state.userId = null;
+        state.providerId = null; // Clear providerId on failed login
+        state.roles = [];
+      });
+  },
 });
 
-// ✅ Export actions
-export const { logout, clearAuthMessages, resetAuthState } = providerAuthSlice.actions;
+export const { logout, clearAuthError, clearAuthMessages , resetAuthState } = providerAuthSlice.actions;
 
-// ✅ Export reducer
 export default providerAuthSlice.reducer;
+

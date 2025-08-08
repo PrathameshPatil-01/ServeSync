@@ -1,17 +1,18 @@
 import ProviderLayout from '@/layouts/ProviderLayout.jsx';
-import EarningsPage from '@/pages/provider/EarningsPage.jsx';
-import OrdersPage from '@/pages/provider/OrdersPage.jsx';
-import SchedulePage from '@/pages/provider/SchedulePage.jsx';
-import ProviderDashboard from '@/pages/provider/ProviderDashboard.jsx'; // New
-import ProfileSettings from '@/pages/provider/ProfileSettings.jsx'; // New
-import ServiceManagement from '@/pages/provider/ServiceManagement.jsx'; // New
-import ReviewsPage from '@/pages/provider/ReviewsPage.jsx'; // New
+import Dashboard from '@/pages/provider/Dashboard.jsx';
+import Earnings from '@/pages/provider/Earnings.jsx';
+import Login from '@/pages/provider/Login.jsx';
+import Orders from '@/pages/provider/Orders.jsx';
+import Profile from '@/pages/provider/Profile.jsx';
+import Signup from '@/pages/provider/Signup.jsx';
+import Reviews from '@/pages/provider/Reviews.jsx';
+import Schedule from '@/pages/provider/Schedule.jsx';
+import Services from '@/pages/provider/Services.jsx';
+import ForgotPassword from '@/pages/provider/ForgotPassword.jsx';
+
 
 import { Route, Routes } from 'react-router-dom';
-import ForgotPassword from '../pages/provider/auth/ForgotPassword.jsx';
-import Login from '../pages/provider/auth/Login.jsx';
-import ProviderRegistrationForm from '@/pages/provider/auth/ProviderRegistrationForm.jsx';
-import Signup from '../pages/provider/auth/Signup.jsx';
+
 
 export default function ProviderRoutes() {
   return (
@@ -19,18 +20,17 @@ export default function ProviderRoutes() {
       {/* Public routes without sidebar */}
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
-      <Route path="forgot-password" element={<ForgotPassword />} />
-      <Route path="register" element={<ProviderRegistrationForm />} />
+      <Route path="forgot-password" element={<ForgotPassword />} /> 
 
       {/* Protected/provider routes with sidebar */}
       <Route element={<ProviderLayout />}>
-        <Route path="dashboard" element={<ProviderDashboard />} />
-        <Route path="orders" element={<OrdersPage />} />
-        <Route path="schedule" element={<SchedulePage />} />
-        <Route path="earnings" element={<EarningsPage/>} />
-        <Route path="services" element={<ServiceManagement />} />
-        <Route path="reviews" element={<ReviewsPage />} />
-        <Route path="profile" element={<ProfileSettings />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="schedule" element={<Schedule />} />
+        <Route path="earnings" element={<Earnings />} />
+        <Route path="services" element={<Services />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="reviews" element={<Reviews />} /> 
         {/* Add other protected routes here */}
       </Route>
     </Routes>

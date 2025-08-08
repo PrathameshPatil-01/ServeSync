@@ -1,55 +1,50 @@
+import axiosInstance from '@/api/axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  registerProvider as registerProviderService,
-  fetchProvider as fetchProviderService,
-  updateProvider as updateProviderService,
-  fetchProviderDashboardStats,
-} from '@/services/providerService.js';
 
-export const registerProvider = createAsyncThunk(
-  'provider/register',
-  async (providerData, { rejectWithValue }) => {
-    try {
-      const response = await registerProviderService(providerData);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.message || 'Provider registration failed');
-    }
-  }
-);
-
+// Fetch current provider's profile
 export const fetchProvider = createAsyncThunk(
-  'provider/fetch',
-  async (providerId, { rejectWithValue }) => {
+  'provider/fetchProvider',
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await fetchProviderService(providerId);
-      return response;
+      const response = await axiosInstance.get('/providers/current');
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Fetching provider failed');
+      const message = error.response?.data?.message || error.message || 'Failed to fetch provider profile';
+      return rejectWithValue(message);
     }
   }
 );
 
+// Update provider's profile
 export const updateProvider = createAsyncThunk(
-  'provider/update',
+  'provider/updateProvider',
   async ({ providerId, updateData }, { rejectWithValue }) => {
     try {
-      const response = await updateProviderService(providerId, updateData);
-      return response;
+      const response = await axiosInstance.put(`/providers/${providerId}`, updateData);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Updating provider failed');
+      const message = error.response?.data?.message || error.message || 'Failed to update provider profile';
+      return rejectWithValue(message);
     }
   }
 );
 
-export const fetchDashboardStats = createAsyncThunk(
+// Fetch provider dashboard statistics
+export const fetchProviderDashboardStats = createAsyncThunk(
   'provider/fetchDashboardStats',
   async (providerId, { rejectWithValue }) => {
     try {
-      const response = await fetchProviderDashboardStats(providerId);
-      return response;
+      const response = await axiosInstance.get(`/earnings/provider/${providerId}/summary`); // Using earnings summary for now
+      // The backend endpoint for dashboard stats is /api/providers/{providerId}/dashboard-stats
+      // Let's use that if it's available, otherwise, adapt.
+      // Assuming the backend provides a dedicated dashboard stats endpoint:
+      console.log(response.data);
+      const dashboardResponse = await axiosInstance.get(`/providers/${providerId}/dashboard-stats`);
+      return dashboardResponse.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to fetch dashboard stats');
+      const message = error.response?.data?.message || error.message || 'Failed to fetch dashboard stats';
+      return rejectWithValue(message);
     }
   }
 );
+

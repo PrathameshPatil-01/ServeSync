@@ -5,7 +5,7 @@ const initialState = {
   location: '',
 };
 
-const searchSlice = createSlice({
+export const searchSlice = createSlice({
   name: 'search',
   initialState,
   reducers: {
@@ -15,9 +15,14 @@ const searchSlice = createSlice({
     setLocation: (state, action) => {
       state.location = action.payload;
     },
-    resetSearch: () => initialState,
+    clearSearch: (state) => {
+      state.keyword = '';
+      state.location = '';
+    },
   },
 });
 
-export const { setKeyword, setLocation, resetSearch } = searchSlice.actions;
+export const { setKeyword, setLocation, clearSearch } = searchSlice.actions;
+
 export default searchSlice.reducer;
+

@@ -1,3 +1,4 @@
+// src/components/provider/schedule/BlockTimeDialog.jsx
 import {
   Button,
   Dialog,
@@ -6,7 +7,8 @@ import {
   DialogTitle,
   TextField,
   Box,
-  Typography
+  Typography,
+  CircularProgress,
 } from '@mui/material';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -18,10 +20,10 @@ const validationSchema = Yup.object({
   reason: Yup.string().max(255, 'Reason too long'),
 });
 
-export default function BlockTimeDialog({ open, onClose, onBlock }) {
+export default function BlockTimeDialog({ open, onClose, onBlock, loading }) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Block Time Slot</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+      <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', pb: 2 }}>Block Time Slot</DialogTitle>
       <Formik
         initialValues={{
           date: new Date().toISOString().split('T')[0], // Default to today
@@ -30,14 +32,14 @@ export default function BlockTimeDialog({ open, onClose, onBlock }) {
           reason: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
+        onSubmit={(values, { setSubmitting }) => {
           onBlock(values);
-          onClose();
+          setSubmitting(false); // Dialog closes via onBlock's success/error handling
         }}
       >
-        {({ values, handleChange, handleBlur, touched, errors }) => (
+        {({ values, handleChange, handleBlur, touched, errors, isSubmitting }) => (
           <Form>
-            <DialogContent dividers>
+            <DialogContent dividers sx={{ pt: 2 }}>
               <Box display="flex" flexDirection="column" gap={2}>
                 <TextField
                   name="date"
@@ -50,6 +52,7 @@ export default function BlockTimeDialog({ open, onClose, onBlock }) {
                   error={touched.date && !!errors.date}
                   helperText={touched.date && errors.date}
                   InputLabelProps={{ shrink: true }}
+                  variant="outlined"
                 />
                 <Box display="flex" gap={2}>
                   <TextField
@@ -63,6 +66,7 @@ export default function BlockTimeDialog({ open, onClose, onBlock }) {
                     error={touched.startTime && !!errors.startTime}
                     helperText={touched.startTime && errors.startTime}
                     InputLabelProps={{ shrink: true }}
+                    variant="outlined"
                   />
                   <TextField
                     name="endTime"
@@ -75,6 +79,7 @@ export default function BlockTimeDialog({ open, onClose, onBlock }) {
                     error={touched.endTime && !!errors.endTime}
                     helperText={touched.endTime && errors.endTime}
                     InputLabelProps={{ shrink: true }}
+                    variant="outlined"
                   />
                 </Box>
                 <TextField
@@ -88,12 +93,15 @@ export default function BlockTimeDialog({ open, onClose, onBlock }) {
                   onBlur={handleBlur}
                   error={touched.reason && !!errors.reason}
                   helperText={touched.reason && errors.reason}
+                  variant="outlined"
                 />
               </Box>
             </DialogContent>
-            <DialogActions>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button type="submit" variant="contained">Block Time</Button>
+            <DialogActions sx={{ p: 3 }}>
+              <Button onClick={onClose} color="secondary" variant="outlined">Cancel</Button>
+              <Button type="submit" variant="contained" color="primary" disabled={loading || isSubmitting}>
+                {loading || isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Block Time'}
+              </Button>
             </DialogActions>
           </Form>
         )}

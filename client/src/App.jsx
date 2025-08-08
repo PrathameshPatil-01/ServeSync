@@ -13,15 +13,16 @@ function App() {
     <>
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
+          <CssBaseline /> {/* Ensures consistent baseline CSS across browsers */}
           <Router>
             <AppRoutes />
           </Router>
         </ThemeProvider>
       </Provider>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </>
   );
 }
 
 export default App;
+

@@ -1,10 +1,10 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  fetchProviderServices,
   createProviderService,
-  updateProviderService,
   deleteProviderService,
-} from '@/services/serviceService';
+  fetchProviderServices,
+  updateProviderService,
+} from '@/services/service/serviceService';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchServices = createAsyncThunk(
   'services/fetchServices',

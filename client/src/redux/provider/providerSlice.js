@@ -1,53 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { registerProvider, fetchProvider, updateProvider, fetchDashboardStats } from './providerThunks';
-
-const initialState = {
-  loading: false,
-  success: false,
-  error: null,
-  provider: null,
-  dashboardStats: {
-    totalBookings: 0,
-    pendingOrders: 0,
-    totalEarnings: 0,
-    upcomingAppointments: 0,
-  },
-};
+import { fetchProvider, fetchProviderDashboardStats, updateProvider } from './providerThunks';
 
 const providerSlice = createSlice({
   name: 'provider',
-  initialState,
+  initialState: {
+    provider: null,
+    dashboardStats: null, // Added for dashboard stats
+    loading: false,
+    error: null,
+    success: false,
+  },
   reducers: {
-    resetProviderState: (state) => {
-      state.loading = false;
-      state.success = false;
-      state.error = null;
-      state.provider = null;
-      state.dashboardStats = initialState.dashboardStats;
-    },
     clearProviderError: (state) => {
       state.error = null;
+      state.success = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Register Provider
-      .addCase(registerProvider.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
-      .addCase(registerProvider.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = true;
-        state.provider = action.payload;
-      })
-      .addCase(registerProvider.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Something went wrong';
-        state.success = false;
-      })
-      // Fetch Provider
+      // Fetch Provider Profile
       .addCase(fetchProvider.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -58,9 +29,9 @@ const providerSlice = createSlice({
       })
       .addCase(fetchProvider.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch provider data';
+        state.error = action.payload;
       })
-      // Update Provider
+      // Update Provider Profile
       .addCase(updateProvider.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -68,29 +39,30 @@ const providerSlice = createSlice({
       })
       .addCase(updateProvider.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
         state.provider = action.payload;
+        state.success = true;
       })
       .addCase(updateProvider.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to update provider data';
+        state.error = action.payload;
         state.success = false;
       })
-      // Fetch Dashboard Stats
-      .addCase(fetchDashboardStats.pending, (state) => {
+      // Fetch Provider Dashboard Stats
+      .addCase(fetchProviderDashboardStats.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDashboardStats.fulfilled, (state, action) => {
+      .addCase(fetchProviderDashboardStats.fulfilled, (state, action) => {
         state.loading = false;
         state.dashboardStats = action.payload;
       })
-      .addCase(fetchDashboardStats.rejected, (state, action) => {
+      .addCase(fetchProviderDashboardStats.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch dashboard stats';
+        state.error = action.payload;
       });
   },
 });
 
-export const { resetProviderState, clearProviderError } = providerSlice.actions;
+export const { clearProviderError } = providerSlice.actions;
 export default providerSlice.reducer;
+
