@@ -1,10 +1,10 @@
+import { clearEarningError } from '@/redux/provider/earnings/earningSlice';
 import {
-  clearEarningError,
   fetchEarningsSummary,
   fetchPayoutHistory,
   fetchTransactions,
   requestPayout,
-} from '@/redux/provider/earnings/earningSlice';
+} from '@/redux/provider/earnings/earningThunks';
 import {
   Alert,
   Box,
@@ -43,7 +43,7 @@ const payoutRequestSchema = Yup.object({
 
 export default function Earnings() {
   const dispatch = useDispatch();
-  const { providerId } = useSelector((state) => state.providerAuth);
+  const { user } = useSelector((state) => state.providerAuth);
   const { summary, transactions, payoutHistory, loading, error } = useSelector((state) => state.earning);
 
   const [payoutDialogOpen, setPayoutDialogOpen] = useState(false);
@@ -56,17 +56,17 @@ export default function Earnings() {
   const payoutsPerPage = 5;
 
   useEffect(() => {
-    if (providerId) {
-      dispatch(fetchEarningsSummary(providerId));
+    if (user?.providerId) {
+      dispatch(fetchEarningsSummary(user?.providerId));
       dispatch(fetchTransactions({
-        providerId,
+          providerId: user?.providerId,
         startDate: transactionFilterStartDate,
         endDate: transactionFilterEndDate,
         pageable: { page: transactionPage, size: transactionsPerPage }
       }));
-      dispatch(fetchPayoutHistory({ providerId, pageable: { page: payoutPage, size: payoutsPerPage } }));
+      dispatch(fetchPayoutHistory({ providerId : user?.providerId, pageable: { page: payoutPage, size: payoutsPerPage } }));
     }
-  }, [dispatch, providerId, transactionPage, payoutPage, transactionFilterStartDate, transactionFilterEndDate]);
+  }, [dispatch, user?.providerId, transactionPage, payoutPage, transactionFilterStartDate, transactionFilterEndDate]);
 
   useEffect(() => {
     if (error) {
@@ -76,18 +76,18 @@ export default function Earnings() {
   }, [error, dispatch]);
 
   const handleRequestPayout = (values, { setSubmitting, resetForm }) => {
-    if (!providerId) {
+    if (!user?.providerId) {
       toast.error("Provider ID not found. Cannot request payout.");
       setSubmitting(false);
       return;
     }
-    dispatch(requestPayout({ providerId, amount: values.amount }))
+    dispatch(requestPayout({ providerId : user?.providerId, amount: values.amount }))
       .unwrap()
       .then(() => {
         setPayoutDialogOpen(false);
         resetForm();
         // Re-fetch summary to update available balance
-        dispatch(fetchEarningsSummary(providerId));
+        dispatch(fetchEarningsSummary(user?.providerId));
       })
       .catch(() => {
         // Error handled by toast in thunk
@@ -108,7 +108,7 @@ export default function Earnings() {
   const applyTransactionFilters = () => {
     setTransactionPage(0); // Reset page on filter apply
     dispatch(fetchTransactions({
-      providerId,
+      providerId : user?.providerId,
       startDate: transactionFilterStartDate,
       endDate: transactionFilterEndDate,
       pageable: { page: 0, size: transactionsPerPage }
@@ -120,7 +120,7 @@ export default function Earnings() {
     setTransactionFilterEndDate('');
     setTransactionPage(0);
     dispatch(fetchTransactions({
-      providerId,
+      providerId : user?.providerId,
       pageable: { page: 0, size: transactionsPerPage }
     }));
   };

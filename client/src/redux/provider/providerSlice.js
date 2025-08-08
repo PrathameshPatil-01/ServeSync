@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchProvider, fetchProviderDashboardStats, updateProvider } from './providerThunks';
+import { fetchProvider, fetchProviderDashboardStats, registerProvider, updateProvider } from './providerThunks';
 
 const providerSlice = createSlice({
   name: 'provider',
@@ -18,6 +18,23 @@ const providerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+      // Register Provider
+      .addCase(registerProvider.pending, (state) => { 
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(registerProvider.fulfilled, (state, action) => {
+        state.loading = false;
+        state.provider = action.payload;
+        state.success = true;
+      })
+      .addCase(registerProvider.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
       // Fetch Provider Profile
       .addCase(fetchProvider.pending, (state) => {
         state.loading = true;

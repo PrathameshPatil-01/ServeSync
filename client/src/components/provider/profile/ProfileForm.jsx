@@ -1,22 +1,22 @@
 // src/components/provider/profile/ProfileForm.jsx
-import { clearProviderError } from '@/redux/provider/providerSlice';
-import { fetchProvider, updateProvider } from '@/redux/provider/providerThunks';
 import {
-  Alert,
   Box,
   Button,
-  CircularProgress,
-  Grid,
   TextField,
   Typography,
+  CircularProgress,
+  Alert,
+  Grid,
 } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateProvider, fetchProvider } from '@/redux/provider/providerThunks';  
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { clearProviderError } from '@/redux/provider/providerSlice';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required('Full name is required'),
@@ -41,13 +41,13 @@ const validationSchema = Yup.object({
 export default function ProfileForm() {
   const dispatch = useDispatch();
   const { provider, loading, error, success } = useSelector((state) => state.provider);
-  const { providerId } = useSelector((state) => state.providerAuth);
+  const { user } = useSelector((state) => state.providerAuth);
 
   useEffect(() => {
-    if (providerId) {
-      dispatch(fetchProvider(providerId)); // Pass providerId to fetchProvider
+    if (user?.providerId) {
+      dispatch(fetchProvider(user?.providerId)); // Pass user?.providerId to fetchProvider
     }
-  }, [dispatch, providerId]);
+  }, [dispatch, user?.providerId]);
 
   useEffect(() => {
     if (success) {
@@ -98,7 +98,7 @@ export default function ProfileForm() {
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        if (!providerId) {
+        if (!user?.providerId) {
           toast.error("Provider ID not found. Cannot update profile.");
           setSubmitting(false);
           return;

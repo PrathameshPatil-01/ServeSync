@@ -1,6 +1,7 @@
 // src/pages/auth/Signup.jsx
 import AuthLayout from '@/layouts/AuthLayout.jsx';
-import { clearAuthMessages, resetAuthState , signup } from '@/redux/provider/auth/providerAuthSlice';
+import { clearAuthMessages, resetAuthState } from '@/redux/provider/auth/providerAuthSlice';
+import { signup } from '@/redux/provider/auth/providerAuthThunks';
 import {
   Box,
   Button,
@@ -30,7 +31,7 @@ const validationSchema = Yup.object({
     .required('Confirm your password'),
 });
 
-export default function ProviderSignup() { // Renamed component to Signup
+export default function Signup() { // Renamed component to Signup
   const dispatch = useDispatch();
   const { signupSuccess, loading, error } = useSelector((state) => state.providerAuth); // Using providerAuth slice
   const navigate = useNavigate();

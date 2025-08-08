@@ -18,17 +18,17 @@ import { motion } from 'framer-motion';
 
 export default function Services() { // Renamed component to Services
   const dispatch = useDispatch();
-  const { providerId } = useSelector((state) => state.providerAuth);
+  const { user } = useSelector((state) => state.providerAuth);
   const { offers, loading, error } = useSelector((state) => state.providerServiceOffer);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState(null);
 
   useEffect(() => {
-    if (providerId) {
-      dispatch(fetchProviderServiceOffers(providerId));
+    if (user?.providerId) {
+      dispatch(fetchProviderServiceOffers(user?.providerId));
     }
-  }, [dispatch, providerId]);
+  }, [dispatch, user?.providerId]);
 
   useEffect(() => {
     if (error) {
@@ -61,7 +61,7 @@ export default function Services() { // Renamed component to Services
   };
 
   const handleSaveService = (values) => {
-    if (!providerId) {
+    if (!user?.providerId) {
       toast.error("Provider ID not found. Cannot save service offer.");
       return;
     }
@@ -79,7 +79,7 @@ export default function Services() { // Renamed component to Services
         });
     } else {
       // Add new service offer
-      dispatch(addProviderServiceOffer({ providerId, offerData: values }))
+      dispatch(addProviderServiceOffer({ providerId : user?.providerId, offerData: values }))
         .unwrap()
         .then(() => {
           toast.success('Service offer added successfully!');

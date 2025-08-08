@@ -112,15 +112,15 @@ export default function Register() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, success, error } = useSelector((state) => state.provider);
-    const { providerId } = useSelector((state) => state.providerAuth);
+    const { user } = useSelector((state) => state.providerAuth);
     const [activeStep, setActiveStep] = useState(0);
 
     useEffect(() => {
-        if (providerId) {
+        if (user?.providerId) {
             // Provider is already registered
             navigate('/provider/dashboard');
         }
-    }, [dispatch, navigate, providerId]);
+    }, [dispatch, navigate, user?.providerId]);
 
     useEffect(() => {
         if (success) navigate('/provider/dashboard');

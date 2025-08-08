@@ -1,6 +1,7 @@
 // src/pages/auth/Login.jsx
 import AuthLayout from '@/layouts/AuthLayout.jsx';
-import { clearAuthError, clearAuthMessages, login } from '@/redux/provider/auth/providerAuthSlice';
+import { clearAuthError, clearAuthMessages } from '@/redux/provider/auth/providerAuthSlice';
+import { login } from '@/redux/provider/auth/providerAuthThunks';
 import { Box, Button, CircularProgress, Link as MuiLink, TextField, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useEffect } from 'react';
@@ -18,7 +19,7 @@ const validationSchema = Yup.object({
 
 export default function Login() { // Renamed component to Login
   const dispatch = useDispatch();
-  const { loading, error, isAuthenticated, roles } = useSelector((state) => state.providerAuth); // Using providerAuth slice
+  const { loading, error, isAuthenticated, user } = useSelector((state) => state.providerAuth); // Using providerAuth slice
 
   const navigate = useNavigate();
 
@@ -30,15 +31,11 @@ export default function Login() { // Renamed component to Login
   }, [error, dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated && roles.includes('ROLE_PROVIDER')) {
-      toast.success('Logged in successfully!');
-      navigate('/provider/dashboard', { replace: true });
-    } else if (isAuthenticated && roles.includes('ROLE_CUSTOMER')) {
-      // If a customer tries to log in via provider path, redirect to customer dashboard
-      toast.info('Logged in as customer. Redirecting to customer dashboard.');
-      navigate('/dashboard', { replace: true });
+    if (isAuthenticated && user) {
+      navigate('/provider/register'); // Redirect to dashboard on successful login
     }
-  }, [isAuthenticated, roles, navigate]);
+  }, [isAuthenticated, user, navigate, dispatch]);
+
 
   useEffect(() => {
     dispatch(clearAuthMessages()); // Clear messages on component mount   

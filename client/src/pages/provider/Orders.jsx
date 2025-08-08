@@ -1,9 +1,8 @@
 // src/pages/provider/Orders.jsx
 import OrderCard from '@/components/provider/orders/OrderCard';
 import OrdersFilterTabs from '@/components/provider/orders/OrdersFilterTabs';
-import { clearOrderError } from '@/redux/provider/orders/orderSlice';
-import { fetchOrders, updateOrder } from '@/redux/provider/orders/orderThunks';
-import { Box, CircularProgress, Grid, TextField, Typography, Alert, Pagination } from '@mui/material';
+import { clearOrderError, fetchAllProviderOrders, updateOrder } from '@/redux/provider/orders/orderSlice';
+import { Alert, Box, CircularProgress, Grid, Pagination, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -14,7 +13,7 @@ const statuses = ['all', 'pending', 'confirmed', 'in_progress', 'completed', 'ca
 
 export default function Orders() { // Renamed component to Orders
     const dispatch = useDispatch();
-    const { userId } = useSelector((state) => state.providerAuth);
+    const { user } = useSelector((state) => state.providerAuth);
     const { orders, totalPages, loading, error } = useSelector((state) => state.order);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,10 +21,10 @@ export default function Orders() { // Renamed component to Orders
     const [page, setPage] = useState(0); // Backend uses 0-indexed pages
 
     useEffect(() => {
-        if (userId) {
-            dispatch(fetchOrders({ providerId: userId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
+        if (user?.providerId) {
+            dispatch(fetchAllProviderOrders({ providerId: user?.providerId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
         }
-    }, [dispatch, userId, selectedStatus, searchTerm, page]);
+    }, [dispatch, user?.providerId, selectedStatus, searchTerm, page]);
 
     useEffect(() => {
         if (error) {
@@ -40,7 +39,7 @@ export default function Orders() { // Renamed component to Orders
             .then(() => {
                 toast.success(`Order ${orderId} status updated to ${newStatus}!`);
                 // Re-fetch orders to update the list
-                dispatch(fetchOrders({ providerId: userId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
+                dispatch(fetchAllProviderOrders({ providerId: user?.providerId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
             })
             .catch(() => {
                 // Error handled by useEffect above

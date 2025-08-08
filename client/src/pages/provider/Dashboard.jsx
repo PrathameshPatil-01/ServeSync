@@ -12,18 +12,18 @@ import { motion } from 'framer-motion';
 
 export default function Dashboard() {
   const dispatch = useDispatch();
-  const { providerId } = useSelector((state) => state.providerAuth);
+  const { user } = useSelector((state) => state.providerAuth);
   const { dashboardStats, loading: statsLoading, error: statsError } = useSelector((state) => state.provider);
   const { offers, loading: offersLoading, error: offersError } = useSelector((state) => state.providerServiceOffer);
   const { orders, loading: ordersLoading, error: ordersError } = useSelector((state) => state.order);
 
   useEffect(() => {
-    if (providerId) {
-      dispatch(fetchProviderDashboardStats(providerId));
-      dispatch(fetchProviderServiceOffers(providerId));
-      dispatch(fetchProviderOrders({ providerId, status: 'pending', pageable: { page: 0, size: 5 } })); // Fetch some pending orders
+    if (user?.providerId) {
+      dispatch(fetchProviderDashboardStats(user?.providerId));
+      dispatch(fetchProviderServiceOffers(user?.providerId));
+      dispatch(fetchProviderOrders({ providerId : user?.providerId , status: 'pending', pageable: { page: 0, size: 5 } })); // Fetch some pending orders
     }
-  }, [dispatch, providerId]);
+  }, [dispatch, user?.providerId]);
 
   return (
     <motion.div

@@ -1,113 +1,109 @@
-import axiosInstance from '@/api/axios';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
+import { login, signup } from './providerAuthThunks';
 
-// Async Thunks
-export const registerProvider = createAsyncThunk(
-  'providerAuth/register',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post('/users/register', { ...userData, role: 'ROLE_PROVIDER' });
-      toast.success('Registration successful! Please login.');
-      return response.data;
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Registration failed';
-      toast.error(message);
-      return rejectWithValue(message);
-    }
+// Utility: safely load user from localStorage
+const loadUserFromStorage = () => {
+  try {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.error('Failed to parse user from localStorage:', error);
+    return null;
   }
-);
+};
 
-export const loginProvider = createAsyncThunk(
-  'providerAuth/login',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post('/users/login', credentials);
-      const { token, userId, roles, providerId } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('roles', JSON.stringify(roles));
-      if (providerId) {
-        localStorage.setItem('providerId', providerId);
-      }
-      toast.success('Login successful!');
-      return { token, userId, roles, providerId };
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Login failed';
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
+// Utility: store user to localStorage
+const saveUserToStorage = (user) => {
+  localStorage.setItem('user', JSON.stringify(user));
+};
 
-// Slice
+// Utility: remove user from localStorage
+const removeUserFromStorage = () => {
+  localStorage.removeItem('user');
+};
+
+const initialState = {
+  user: loadUserFromStorage(),
+  loading: false,
+  error: null,
+  isAuthenticated: !!loadUserFromStorage(),
+  signupSuccess: false,
+};
+
 const providerAuthSlice = createSlice({
   name: 'providerAuth',
-  initialState: {
-    token: localStorage.getItem('token') || null,
-    userId: localStorage.getItem('userId') || null,
-    providerId: localStorage.getItem('providerId') || null, // Added providerId
-    roles: localStorage.getItem('roles') ? JSON.parse(localStorage.getItem('roles')) : [],
-    loading: false,
-    error: null,
-    isAuthenticated: !!localStorage.getItem('token'),
-  },
+  initialState,
   reducers: {
     logout: (state) => {
-      state.token = null;
-      state.userId = null;
-      state.providerId = null; // Clear providerId on logout
-      state.roles = [];
+      state.user = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('providerId'); // Remove from local storage
-      localStorage.removeItem('roles');
+      removeUserFromStorage();
       toast.info('Logged out successfully.');
     },
     clearAuthError: (state) => {
       state.error = null;
     },
+    clearAuthMessages: (state) => {
+      state.signupSuccess = false;
+      state.error = null;
+    },
+    resetAuthState: (state) => {
+      state.user = null;
+      state.loading = false;
+      state.error = null;
+      state.isAuthenticated = false;
+      state.signupSuccess = false;
+      removeUserFromStorage();
+    },
+
   },
   extraReducers: (builder) => {
     builder
-      .addCase(registerProvider.pending, (state) => {
+      // Signup
+      .addCase(signup.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.signupSuccess = false;
       })
-      .addCase(registerProvider.fulfilled, (state) => {
+      .addCase(signup.fulfilled, (state) => {
         state.loading = false;
-        // No token or auth status update on register, user needs to login
+        state.signupSuccess = true;
+        toast.success('Signup successful. Please log in.');
       })
-      .addCase(registerProvider.rejected, (state, action) => {
+      .addCase(signup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        toast.error(action.payload || 'Signup failed');
       })
-      .addCase(loginProvider.pending, (state) => {
+
+      // Login
+      .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginProvider.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
+        const user = action.payload;
+
         state.loading = false;
-        state.token = action.payload.token;
-        state.userId = action.payload.userId;
-        state.providerId = action.payload.providerId; // Set providerId
-        state.roles = action.payload.roles;
+        state.user = user;
         state.isAuthenticated = true;
+        saveUserToStorage(user);
+
+        toast.success('Login successful.');
       })
-      .addCase(loginProvider.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.user = null;
         state.isAuthenticated = false;
-        state.token = null;
-        state.userId = null;
-        state.providerId = null; // Clear providerId on failed login
-        state.roles = [];
+        removeUserFromStorage();
+
+        toast.error(action.payload || 'Login failed');
       });
   },
 });
 
-export const { logout, clearAuthError } = providerAuthSlice.actions;
+export const { logout, clearAuthError, clearAuthMessages, resetAuthState } = providerAuthSlice.actions;
 
 export default providerAuthSlice.reducer;
-

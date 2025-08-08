@@ -34,7 +34,7 @@ const daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SAT
 
 export default function Schedule() {
   const dispatch = useDispatch();
-  const { providerId } = useSelector((state) => state.providerAuth);
+  const { user } = useSelector((state) => state.providerAuth);
   const { dailySchedule, workingHours, loading, error } = useSelector((state) => state.schedule);
 
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
@@ -44,11 +44,11 @@ export default function Schedule() {
   const [currentHoursForDialog, setCurrentHoursForDialog] = useState(null);
 
   useEffect(() => {
-    if (providerId) {
-      dispatch(fetchDailySchedule({ providerId, date: selectedDate }));
-      dispatch(fetchWorkingHours(providerId));
+    if (user?.providerId) {
+      dispatch(fetchDailySchedule({ providerId : user?.providerId, date: selectedDate }));
+      dispatch(fetchWorkingHours(user?.providerId));
     }
-  }, [dispatch, providerId, selectedDate]);
+  }, [dispatch, user?.providerId, selectedDate]);
 
   useEffect(() => {
     if (error) {
@@ -63,13 +63,13 @@ export default function Schedule() {
   };
 
   const handleBlockTime = (values) => {
-    if (!providerId) {
+    if (!user?.providerId) {
       toast.error("Provider ID not found. Cannot block time.");
       return;
     }
     const startTime = dayjs(`${values.date}T${values.startTime}`).toISOString();
     const endTime = dayjs(`${values.date}T${values.endTime}`).toISOString();
-    dispatch(addBlockedTimeSlot({ providerId, slotData: { startTime, endTime, reason: values.reason } }));
+    dispatch(addBlockedTimeSlot({ providerId : user?.providerId, slotData: { startTime, endTime, reason: values.reason } }));
   };
 
   const handleDeleteBlockedSlot = (slotId) => {
@@ -85,7 +85,7 @@ export default function Schedule() {
   };
 
   const handleSaveWorkingHours = (day, values) => {
-    if (!providerId) {
+    if (!user?.providerId) {
       toast.error("Provider ID not found. Cannot update working hours.");
       return;
     }
@@ -114,7 +114,7 @@ export default function Schedule() {
         });
     }
 
-    dispatch(updateWorkingHours({ providerId, workingHoursData: updatedWorkingHours }));
+    dispatch(updateWorkingHours({ providerId : user?.providerId, workingHoursData: updatedWorkingHours }));
   };
 
   const getDisplayHours = (day) => {

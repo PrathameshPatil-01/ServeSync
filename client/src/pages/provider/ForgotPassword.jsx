@@ -1,7 +1,7 @@
 // src/pages/auth/ForgotPassword.jsx
 import AuthLayout from '@/layouts/AuthLayout.jsx';
 import { clearAuthMessages } from '@/redux/provider/auth/providerAuthSlice';
-import { forgotPassword } from '@/redux/provider/auth/providerAuthSlice';
+import { forgotPassword } from '@/redux/provider/auth/providerAuthThunks';
 import {
   Box,
   Button,

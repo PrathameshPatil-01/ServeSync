@@ -1,5 +1,21 @@
 import axiosInstance from '@/api/axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
+
+//  Add provider's profile
+export const registerProvider = createAsyncThunk(
+  'provider/register',
+  async (providerData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/providers', providerData);
+      toast.success('Provider registered successfully!');
+      return response.data;
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to register provider';
+      return rejectWithValue(message);
+    }
+  }
+);
 
 // Fetch current provider's profile
 export const fetchProvider = createAsyncThunk(
@@ -39,8 +55,8 @@ export const fetchProviderDashboardStats = createAsyncThunk(
       // Let's use that if it's available, otherwise, adapt.
       // Assuming the backend provides a dedicated dashboard stats endpoint:
       console.log(response.data);
-      const dashboardResponse = await axiosInstance.get(`/providers/${providerId}/dashboard-stats`);
-      return dashboardResponse.data;
+      // const dashboardResponse = await axiosInstance.get(`/providers/${providerId}/dashboard-stats`);
+      return response.data;
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Failed to fetch dashboard stats';
       return rejectWithValue(message);
@@ -48,3 +64,19 @@ export const fetchProviderDashboardStats = createAsyncThunk(
   }
 );
 
+
+// update user address
+export const updateUserAddress = createAsyncThunk(
+    'provider/updateUserAddress',
+    async (id, addressDetails, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.put(`/users/user/${id}/address`, addressDetails);
+            toast.success('User address updated successfully!');
+            return response.data;
+        } catch (error) {
+            const message = error.response?.data?.message || error.message || 'Failed to update user address';
+            toast.error(message);
+            return rejectWithValue(message);
+        }
+        }
+);
