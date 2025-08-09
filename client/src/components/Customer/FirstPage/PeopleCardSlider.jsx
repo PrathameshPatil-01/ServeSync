@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllProviders } from '@/services/providrservice1';
+// Update this import to your correct fetch function that calls /all-users-with-services
+import { fetchAllUsersWithServices } from '@/services/providrservice1';
 import './PeopleCardSlider.css';
 
 const PeopleCardSlider = () => {
@@ -11,7 +12,7 @@ const PeopleCardSlider = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const providers = await fetchAllProviders();
+        const providers = await fetchAllUsersWithServices();
         console.log('Fetched providers:', providers);
 
         if (!Array.isArray(providers)) {
@@ -20,18 +21,35 @@ const PeopleCardSlider = () => {
           return;
         }
 
-        // Save raw data for later navigation
         setRawProviders(providers);
 
-        const formattedData = providers.map(provider => ({
-          id: provider.id,
+        // Group providers by providerId to avoid duplicates and collect services
+        const groupedProviders = providers.reduce((acc, curr) => {
+          if (!acc[curr.providerId]) {
+            acc[curr.providerId] = {
+              providerId: curr.providerId,
+              fullName: curr.fullName,
+              businessName: curr.businessName,
+              services: [curr.serviceName],
+              estimatedDuration: curr.estimatedDuration,
+            };
+          } else {
+            if (!acc[curr.providerId].services.includes(curr.serviceName)) {
+              acc[curr.providerId].services.push(curr.serviceName);
+            }
+          }
+          return acc;
+        }, {});
+
+        // Convert grouped object to array
+        const formattedData = Object.values(groupedProviders).map((provider) => ({
+          id: provider.providerId,
           name: provider.fullName,
-          profession: provider.skills || 'Professional',
-          description: provider.description || 'No description provided.',
-          image: provider.profileImage
-            ? `data:image/jpeg;base64,${provider.profileImage}`
-            : '/images/default-profile.jpg',
+          profession: provider.services.join(', '), // show all services joined
+          description: provider.businessName || 'No description provided.',
+          image: '/images/default-profile.jpg', // no image from API, use default or update accordingly
           bgColor: getRandomColor(),
+          estimatedDuration: provider.estimatedDuration,
         }));
 
         setPeople(formattedData);
@@ -50,10 +68,21 @@ const PeopleCardSlider = () => {
   };
 
   const handleCardClick = (id) => {
-    const selectedProvider = rawProviders.find((p) => p.id === id);
-    if (selectedProvider) {
-      const encodedName = encodeURIComponent(selectedProvider.fullName);
-      navigate(`/customer/provider/${encodedName}`, { state: { provider: selectedProvider } });
+    // Find all entries for this providerId in rawProviders
+    const selectedProviderEntries = rawProviders.filter((p) => p.providerId === id);
+
+    if (selectedProviderEntries.length > 0) {
+      // Prepare combined provider info to pass in state
+      const providerData = {
+        providerId: id,
+        fullName: selectedProviderEntries[0].fullName,
+        businessName: selectedProviderEntries[0].businessName,
+        services: [...new Set(selectedProviderEntries.map(p => p.serviceName))], // unique services
+        estimatedDuration: selectedProviderEntries[0].estimatedDuration,
+      };
+
+      const encodedName = encodeURIComponent(providerData.fullName);
+      navigate(`/customer/provider/${encodedName}`, { state: { provider: providerData } });
     }
   };
 

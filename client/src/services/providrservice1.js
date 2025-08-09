@@ -1,21 +1,17 @@
-
 // src/services/providerService.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/providers';
+const BASE_URL = 'http://localhost:8080/api/service-providers';
 
-export const fetchAllProviders = async () => {
+// ✅ Call to /all-users-with-services
+export const fetchAllUsersWithServices = async () => {
   try {
-    const response = await axios.get(API_BASE_URL);
-    console.log("Provider API response:", response.data);
-    
-    // If API response is { data: [...] }
-    if (Array.isArray(response.data)) return response.data;
-    if (Array.isArray(response.data.data)) return response.data.data;
+    const response = await axios.get(`${BASE_URL}/all-users-with-services`);
+    console.log("All Users With Services API response:", response.data);
 
-    return []; // fallback if nothing is correct
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
-    console.error('Error fetching providers:', error);
+    console.error('Error fetching users with services:', error);
     throw error;
   }
 };

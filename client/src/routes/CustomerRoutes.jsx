@@ -10,6 +10,7 @@ import Signup from "../pages/customer/auth/Signup.jsx"
 import ForgotPasswordForm from '@/pages/customer/auth/ForgotPassword.jsx';
 import ProviderCards from '@/pages/customer/ProviderCards.jsx';
 import MyListPage from '@/components/Customer/Liked/MyListPage.jsx';
+import CartPage from '@/pages/customer/CartPage.jsx';
 
 
 export default function CustomerRoutes() {
@@ -26,7 +27,7 @@ export default function CustomerRoutes() {
         <Route path="category/:slug" element={<CategoryPage/>} />
         <Route path="provider/:name" element={<ProviderCards />} />
         <Route path="/my-list" element={<MyListPage />} />
-        <Route path="cart" element={<CategoryPage/>}/>
+        <Route path="cart" element={<CartPage/>}/>
       </Route>
     </Routes>
   );

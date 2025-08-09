@@ -9,7 +9,9 @@ import { setProducts } from '../../redux/customer/customerProvider/productSlice'
 import CategorySidebar from '@/components/Customer/CategoryPage/CategorySidebar';
 import ProductCard from '@/components/Customer/CategoryPage/ProductCard';
 import Footer from '@/components/Footer';
-import { fetchAllProviders } from '@/services/providrservice1';
+
+// Updated import: call correct service function
+import { fetchAllUsersWithServices } from '@/services/providrservice1';
 
 const CategoryPage = () => {
   const { slug } = useParams();
@@ -23,23 +25,29 @@ const CategoryPage = () => {
       setLoading(true);
 
       try {
-        const data = await fetchAllProviders();
-        setProviders(data);
+        const data = await fetchAllUsersWithServices();
 
-        // Map to ProductCard + Search format (include `id` and `name`)
         const formatted = data.map((provider) => ({
-          id: provider.id, // 🔥 Important for Redux list and search
+          providerId: provider.providerId,
           name: provider.fullName,
-          quantity: `${provider.yearsOfExperience} yrs exp`,
-          price: provider.chargePerHour || 0,
-          label: provider.skills,
-          category: provider.skills?.toLowerCase(),
-          image: provider.profileImage
-            ? `data:image/jpeg;base64,${provider.profileImage}`
-            : '/images/default-profile.png',
+          quantity: provider.serviceName,                 // Used in UI
+          price: 0,                                       // Static as no price in DTO
+          label: provider.businessName,                  // Business name shown on card
+          category: provider.serviceName?.toLowerCase(), // For filtering
+          image: '/images/default-profile.png',           // Default image
+          estimatedDuration: provider.estimatedDuration,
         }));
 
-        dispatch(setProducts(formatted)); // ✅ Update Redux
+        // Deduplicate providers by providerId
+        const uniqueProviders = formatted.reduce((acc, provider) => {
+          if (!acc.some(p => p.providerId === provider.providerId)) {
+            acc.push(provider);
+          }
+          return acc;
+        }, []);
+
+        setProviders(uniqueProviders);
+        dispatch(setProducts(uniqueProviders));
       } catch (err) {
         console.error('Error loading providers:', err);
       } finally {
@@ -50,14 +58,15 @@ const CategoryPage = () => {
     loadProviders();
   }, [dispatch]);
 
+  // Filter based on the serviceName (slug)
   const filteredProviders =
-  slug?.toLowerCase() === 'all'
-    ? providers
-    : providers.filter(
-        (provider) =>
-          provider.skills &&
-          provider.skills.toLowerCase().includes(slug?.toLowerCase())
-      );
+    slug?.toLowerCase() === 'all'
+      ? providers
+      : providers.filter(
+          (provider) =>
+            provider.category &&
+            provider.category.includes(slug?.toLowerCase())
+        );
 
   return (
     <div>
@@ -69,19 +78,18 @@ const CategoryPage = () => {
           ) : (
             <div className="product-grid">
               {filteredProviders.length > 0 ? (
-                filteredProviders.map((provider, idx) => (
+                filteredProviders.map((provider) => (
                   <ProductCard
-                    key={provider.id}
+                    key={`${provider.providerId}`} // Unique key by providerId
                     product={{
-                      id: provider.id, // 🔥 Also needed for Like/Search
-                      name: provider.fullName,
-                      quantity: `${provider.yearsOfExperience} yrs exp`,
-                      price: provider.chargePerHour || 0,
-                      label: provider.skills,
-                      category: provider.skills?.toLowerCase(),
-                      image: provider.profileImage
-                        ? `data:image/jpeg;base64,${provider.profileImage}`
-                        : '/images/default-profile.png',
+                      id: provider.providerId, // ✅ used for likes etc.
+                      name: provider.name,
+                      quantity: provider.quantity,
+                      price: provider.price,
+                      label: provider.label,
+                      category: provider.category,
+                      image: provider.image,
+                      estimatedDuration: provider.estimatedDuration,
                     }}
                   />
                 ))

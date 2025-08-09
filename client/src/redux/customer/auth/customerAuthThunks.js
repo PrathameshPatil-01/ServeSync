@@ -1,24 +1,35 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
-    forgotPassword,
-    loginUser,
-    signupUser,
+  forgotPassword,
+  loginUser,
+  signupUser,
 } from '@/services/authService';
+import { getAddress } from '@/services/addressService';
 
-// LOGIN THUNK
 export const login = createAsyncThunk(
   'customer/login',
   async (credentials, { rejectWithValue }) => {
     try {
       const userData = await loginUser(credentials);
-      return userData;
+      localStorage.setItem('token', userData.token);
+      
+      // Fetch address and merge with user data
+      const addresses = await getAddress(userData.token);
+      const primaryAddress = addresses?.[0] || {};
+      
+      return { 
+        ...userData,
+        ...primaryAddress, // Flatten address fields
+        addresses // Keep addresses array
+      };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Something went wrong'
+      );
     }
   }
 );
 
-// REGISTER THUNK
 export const signup = createAsyncThunk(
   'customer/signup',
   async (userData, { rejectWithValue }) => {
@@ -31,7 +42,6 @@ export const signup = createAsyncThunk(
   }
 );
 
-// FORGOT PASSWORD THUNK
 export const requestPasswordReset = createAsyncThunk(
   'customer/forgotPassword',
   async (email, { rejectWithValue }) => {

@@ -179,7 +179,7 @@ export default function NavBar({ onUserIconClick, onUserNotificationIconClick })
           {/* Right Section - Icons */}
           <div className="d-flex align-items-center gap-3 fs-5">
             <span className="classy-icon-btn" onClick={toggleNotificationSidebar}>🔔</span>
-            <span className="classy-icon-btn">🛒</span>
+            <span className="classy-icon-btn" onClick={() => navigate('/customer/cart')}>🛒</span>
             <span className="classy-icon-btn" onClick={onUserIconClick}>👤</span>
           </div>
         </div>

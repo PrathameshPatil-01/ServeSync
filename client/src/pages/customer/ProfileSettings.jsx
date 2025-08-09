@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
 import './ProfileSettings.css';
 import EditUserSidebar from '@/components/Customer/EditUser/EditUserSidebar';
 import ChangePasswordSidebar from '@/components/Customer/EditUser/ChangePasswordSidebar';
 import EditAddressSidebar from '@/components/Customer/EditUser/EditAddressSidebar';
 
 const ProfileSettings = () => {
-  const user = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.customerAuth);
 
   const [userDetails, setUserDetails] = useState({
     username: '',
@@ -18,47 +17,70 @@ const ProfileSettings = () => {
     outletCity: '',
     profilePic: '',
     address: {
-      flat: '',
+      house_no: '',
       area: '',
       landmark: '',
-      pincode: '',
+      postalCode: '',
       city: '',
-      state: ''
+      state: '',
     },
   });
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPasswordSidebarOpen, setPasswordSidebarOpen] = useState(false);
   const [isAddressSidebarOpen, setAddressSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user?.token && user.firstName) {
       setUserDetails({
-        username: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-        phone: user.phoneNumber || '–',
-        email: user.email || '–',
-        pan: user.panNumber || '🟠 Unverified',
-        legalName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-        outletCity: user.city || '–',
+        username: `${user.firstName} ${user.lastName}`.trim(),
+        phone: user.phoneNumber || '',
+        email: user.email || '',
+        pan: user.panNumber || '',
+        legalName: `${user.firstName} ${user.lastName}`.trim(),
+        outletCity: user.city || '',
         profilePic: user.profilePic || '',
         address: {
-          flat: user.address?.flat || '–',
-          area: user.address?.area || '–',
-          landmark: user.address?.landmark || '–',
-          pincode: user.address?.pincode || '–',
-          city: user.address?.city || '–',
-          state: user.address?.state || '–',
-        }
+          house_no: user.houseNo || '',
+          area: user.area || '',
+          landmark: user.landmark || '',
+          postalCode: user.postalCode || '',
+          city: user.city || '',
+          state: user.state || '',
+        },
       });
+      setLoading(false);
     }
   }, [user]);
+
+  const renderAddressField = (key, value) => {
+    const labelMap = {
+      house_no: 'House No.',
+      area: 'Area',
+      landmark: 'Landmark',
+      postalCode: 'Postal Code',
+      city: 'City',
+      state: 'State'
+    };
+
+    return (
+      <div className="info-item" key={key}>
+        <div className="label">{labelMap[key]}</div>
+        <div className="value">{value || 'Not provided'}</div>
+      </div>
+    );
+  };
+
+  if (loading) {
+    return <div className="profile-settings-wrapper">Loading user data...</div>;
+  }
 
   return (
     <div className="profile-settings-wrapper">
       <h1 className="profile-settings-title">Profile Settings</h1>
 
       <div className="profile-settings">
-        {/* Left Section - User Info */}
         <div className="profile-left">
           <div className="info-item">
             <div className="label">User name</div>
@@ -74,7 +96,7 @@ const ProfileSettings = () => {
           </div>
           <div className="info-item">
             <div className="label">PAN card number</div>
-            <div className="value pan-unverified">{userDetails.pan}</div>
+            <div className="value">{userDetails.pan || '🟠 Unverified'}</div>
           </div>
           <div className="info-item">
             <div className="label">Legal entity name</div>
@@ -82,16 +104,11 @@ const ProfileSettings = () => {
           </div>
 
           <div className="action-section">
-            <button className="change-password" onClick={() => setPasswordSidebarOpen(true)}>
-              Change Password
-            </button>
-            <button className="edit-details" onClick={() => setIsEditOpen(true)}>
-              Edit Details
-            </button>
+            <button className="change-password" onClick={() => setPasswordSidebarOpen(true)}>Change Password</button>
+            <button className="edit-details" onClick={() => setIsEditOpen(true)}>Edit Details</button>
           </div>
         </div>
 
-        {/* Right Section - Address Card */}
         <div className="profile-right">
           <div className="user-address-card">
             <div className="user-address-header">
@@ -101,30 +118,9 @@ const ProfileSettings = () => {
               </button>
             </div>
 
-            <div className="info-item">
-              <div className="label">Flat, House no., Building, Company, Apartment</div>
-              <div className="value">{userDetails.address.flat}</div>
-            </div>
-            <div className="info-item">
-              <div className="label">Area, Street, Sector, Village</div>
-              <div className="value">{userDetails.address.area}</div>
-            </div>
-            <div className="info-item">
-              <div className="label">Landmark</div>
-              <div className="value">{userDetails.address.landmark}</div>
-            </div>
-            <div className="info-item">
-              <div className="label">Pincode</div>
-              <div className="value">{userDetails.address.pincode}</div>
-            </div>
-            <div className="info-item">
-              <div className="label">City</div>
-              <div className="value">{userDetails.address.city}</div>
-            </div>
-            <div className="info-item">
-              <div className="label">State</div>
-              <div className="value">{userDetails.address.state}</div>
-            </div>
+            {Object.entries(userDetails.address).map(([key, value]) =>
+              renderAddressField(key, value)
+            )}
           </div>
         </div>
       </div>

@@ -4,33 +4,31 @@ import { useSelector } from 'react-redux';
 import { updateAddress } from '@/services/editUserAddress';
 
 const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
-  const userId = useSelector((state) => state.CustomerAuth);
+  const token = useSelector((state) => state.customerAuth.token);
 
-  // Local form state with default empty fields
   const [address, setAddress] = useState({
-    flat: '',
+    houseNo: '',
     area: '',
     landmark: '',
-    pincode: '',
+    postalCode: '',
     city: '',
     state: ''
   });
 
-  // Update form fields when sidebar opens and userAddress is available
   useEffect(() => {
+    console.log('userAddress passed to EditAddressSidebar:', userAddress);
     if (isOpen && userAddress) {
       setAddress({
-        flat: userAddress.flat || '',
+        houseNo: userAddress.house_no  || '',
         area: userAddress.area || '',
         landmark: userAddress.landmark || '',
-        pincode: userAddress.pincode || '',
+        postalCode: userAddress.postalCode || '',
         city: userAddress.city || '',
         state: userAddress.state || ''
       });
     }
   }, [isOpen, userAddress]);
 
-  // Handle input changes
   const handleChange = (field, value) => {
     setAddress((prev) => ({
       ...prev,
@@ -38,31 +36,27 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
     }));
   };
 
-  // Save button handler
   const handleSave = async () => {
-    try {
-      if (!userId) {
-        console.error('User ID is missing');
-        return;
-      }
+  try {
+    // Prepare the payload matching backend
+    const formattedData = {
+      houseNo: address.houseNo,     // map your flat to houseNo here
+      area: address.area,
+      city: address.city,
+      state: address.state,
+      landmark: address.landmark,
+      country: 'India',          // hardcoded if backend expects
+      postalCode: address.postalCode,
+    };
 
-      const formattedData = {
-        flat: address.flat,
-        area: address.area,
-        landmark: address.landmark,
-        postalCode: address.pincode,
-        city: address.city,
-        state: address.state,
-        country: 'India' // default value
-      };
+    await updateAddress(formattedData);
 
-      await updateAddress(userId, formattedData);
-      onSave();   // refresh parent component
-      onClose();  // close the sidebar
-    } catch (error) {
-      console.error('Error updating address:', error);
-    }
-  };
+    onSave(formattedData);  // Pass updated data to parent if needed
+    onClose();             // Close sidebar after success
+  } catch (error) {
+    console.error('Error updating address:', error);
+  }
+};
 
   if (!isOpen) return null;
 
@@ -79,8 +73,8 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
             Flat, House no., Building, Company, Apartment
             <input
               type="text"
-              value={address.flat}
-              onChange={(e) => handleChange('flat', e.target.value)}
+              value={address.houseNo}
+              onChange={(e) => handleChange('houseNo', e.target.value)}
             />
           </label>
 
@@ -103,11 +97,11 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
           </label>
 
           <label>
-            Pincode
+            Postal Code
             <input
               type="text"
-              value={address.pincode}
-              onChange={(e) => handleChange('pincode', e.target.value)}
+              value={address.postalCode}
+              onChange={(e) => handleChange('postalCode', e.target.value)}
             />
           </label>
 
