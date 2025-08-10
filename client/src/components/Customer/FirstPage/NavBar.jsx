@@ -132,21 +132,19 @@ export default function NavBar({ onUserIconClick, onUserNotificationIconClick })
   };
 
   const handleLogoClick = () => navigate('/customer/firstPage');
-  const handleHomesClick = () => navigate('/customer/firstPage');
 
   return (
     <div className="navbar-container">
-    <nav className="navbar navbar-expand-lg classy-navbar w-100">
+      <nav className="navbar navbar-expand-lg classy-navbar w-100">
         <div className="container-fluid d-flex justify-content-between align-items-center px-4">
-          {/* Left Section - Logo and Categories */}
+          {/* Left Section - Logo only */}
           <div className="d-flex align-items-center gap-4">
-            <div className="navbar-brand d-flex align-items-center" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
-              <img src={logo} alt="ServSync" style={{ width: "150px", height: "auto" }} />
-            </div>
-            <div className="d-none d-md-flex gap-3 ms-2">
-              <a className="nav-link classy-link" href="#">Beauty</a>
-              <a className="nav-link classy-link" href="#" onClick={handleHomesClick}>Homes</a>
-              <a className="nav-link classy-link" href="#">Native</a>
+            <div
+              className="navbar-brand d-flex align-items-center"
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer' }}
+            >
+              <img src={logo} alt="ServSync" style={{ width: "200px", height: "auto" }} />
             </div>
           </div>
 
@@ -206,51 +204,50 @@ export default function NavBar({ onUserIconClick, onUserNotificationIconClick })
         </div>
       )}
 
-     {/* Search Modal - Shows when typing or clicking search */}
-{(showSearchModal || (searchTerm.trim().length > 0 && document.activeElement.className.includes('classy-field'))) && (
-  <div
-    className="position-fixed start-0 w-100 bg-white overflow-auto p-4"
-    style={{
-      zIndex: 1051,
-      top: '80px',  // height of navbar, adjust if different
-      height: 'calc(100vh - 80px)', // full viewport height minus navbar
-      borderTop: '1px solid #ccc',
-      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    }}
-  >
-    <div className="d-flex justify-content-between mb-3">
-      <h4>Search Results</h4>
-      <button
-        className="btn btn-sm btn-outline-danger"
-        onClick={() => {
-          
-          setShowSearchModal(false);
-          setSearchTerm('');
-          setFilteredResults([]);
-        }}
-      >
-        Close
-      </button>
-    </div>
-    <div className="row">
-      {filteredResults.length > 0 ? (
-        filteredResults.map((provider) => (
-          <div key={provider.id} className="col-md-4 mb-3">
-            <div onClick={() => handleResultClick(customer/provider)} style={{ cursor: 'pointer' }}>
-              <ProductCard product={provider} />
-            </div>
+      {/* Search Modal */}
+      {(showSearchModal || (searchTerm.trim().length > 0 && document.activeElement.className.includes('classy-field'))) && (
+        <div
+          className="position-fixed start-0 w-100 bg-white overflow-auto p-4"
+          style={{
+            zIndex: 1051,
+            top: '80px',
+            height: 'calc(100vh - 80px)',
+            borderTop: '1px solid #ccc',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          }}
+        >
+          <div className="d-flex justify-content-between mb-3">
+            <h4>Search Results</h4>
+            <button
+              className="btn btn-sm btn-outline-danger"
+              onClick={() => {
+                setShowSearchModal(false);
+                setSearchTerm('');
+                setFilteredResults([]);
+              }}
+            >
+              Close
+            </button>
           </div>
-        ))
-      ) : (
-        <div className="text-center text-muted mt-4">
-          {searchTerm.trim().length > 0 ? "No results found." : "Start typing to search..."}
+          <div className="row">
+            {filteredResults.length > 0 ? (
+              filteredResults.map((provider) => (
+                <div key={provider.id} className="col-md-4 mb-3">
+                  <div onClick={() => handleResultClick(provider)} style={{ cursor: 'pointer' }}>
+                    <ProductCard product={provider} />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-muted mt-4">
+                {searchTerm.trim().length > 0 ? "No results found." : "Start typing to search..."}
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
-  </div>
-)}
- <NotificationSidebar isOpen={isNotificationOpen} onClose={toggleNotificationSidebar} />
-    
+
+      <NotificationSidebar isOpen={isNotificationOpen} onClose={toggleNotificationSidebar} />
     </div>
   );
 }

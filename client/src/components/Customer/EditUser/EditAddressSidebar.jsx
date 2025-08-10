@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './EditAddressSidebar.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateAddress as updateAddressService } from '@/services/editUserAddress';
-import { updateAddress } from '@/redux/customer/auth/customerAuthSlice'; // ✅ match slice export
+import { useDispatch } from 'react-redux';
+import { saveOrUpdateAddress } from '@/services/editUserAddress';
+import { updateAddress } from '@/redux/customer/auth/customerAuthSlice';
 
 const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
-  const token = useSelector((state) => state.customerAuth.token);
   const dispatch = useDispatch();
 
   const [address, setAddress] = useState({
+    id: null,
     houseNo: '',
     area: '',
     landmark: '',
@@ -17,10 +17,12 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
     state: ''
   });
 
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
-    console.log('userAddress passed to EditAddressSidebar:', userAddress);
     if (isOpen && userAddress) {
       setAddress({
+        id: userAddress.id || null,
         houseNo: userAddress.house_no || userAddress.houseNo || '',
         area: userAddress.area || '',
         landmark: userAddress.landmark || '',
@@ -28,6 +30,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
         city: userAddress.city || '',
         state: userAddress.state || ''
       });
+      setErrors({});
     }
   }, [isOpen, userAddress]);
 
@@ -36,35 +39,47 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
       ...prev,
       [field]: value
     }));
+    setErrors((prev) => ({
+      ...prev,
+      [field]: ''
+    }));
+  };
+
+  const validateFields = () => {
+    let newErrors = {};
+    Object.keys(address).forEach((key) => {
+      if (key !== 'id' && !address[key]?.trim()) {
+        newErrors[key] = 'This field is required';
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
+    if (!validateFields()) {
+      alert('⚠️ All fields are mandatory!');
+      return;
+    }
+
     try {
       const formattedData = {
         houseNo: address.houseNo,
         area: address.area,
         city: address.city,
-        stateName: address.state, // ✅ match your slice reducer key
+        state: address.state,
         landmark: address.landmark,
         country: 'India',
         postalCode: address.postalCode
       };
 
-      // 1️⃣ Update backend
-      await updateAddressService(formattedData);
+      const savedAddress = await saveOrUpdateAddress(formattedData, address.id);
+      dispatch(updateAddress(savedAddress));
 
-      // 2️⃣ Update Redux + localStorage instantly
-      dispatch(updateAddress(formattedData));
-
-      // 3️⃣ Callback to parent if provided
-      if (onSave) {
-        onSave(formattedData);
-      }
-
-      // 4️⃣ Close sidebar
+      if (onSave) onSave(savedAddress);
       onClose();
     } catch (error) {
-      console.error('Error updating address:', error);
+      console.error('Error saving address:', error);
     }
   };
 
@@ -74,7 +89,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
     <div className="edit-address-sidebar-overlay">
       <div className="edit-address-sidebar">
         <div className="sidebar-header">
-          <h2>Edit Address</h2>
+          <h2>{address.id ? 'Edit Address' : 'Add Address'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
@@ -86,6 +101,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.houseNo}
               onChange={(e) => handleChange('houseNo', e.target.value)}
             />
+            {errors.houseNo && <span className="error-text">{errors.houseNo}</span>}
           </label>
 
           <label>
@@ -95,6 +111,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.area}
               onChange={(e) => handleChange('area', e.target.value)}
             />
+            {errors.area && <span className="error-text">{errors.area}</span>}
           </label>
 
           <label>
@@ -104,6 +121,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.landmark}
               onChange={(e) => handleChange('landmark', e.target.value)}
             />
+            {errors.landmark && <span className="error-text">{errors.landmark}</span>}
           </label>
 
           <label>
@@ -113,6 +131,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.postalCode}
               onChange={(e) => handleChange('postalCode', e.target.value)}
             />
+            {errors.postalCode && <span className="error-text">{errors.postalCode}</span>}
           </label>
 
           <label>
@@ -122,6 +141,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.city}
               onChange={(e) => handleChange('city', e.target.value)}
             />
+            {errors.city && <span className="error-text">{errors.city}</span>}
           </label>
 
           <label>
@@ -131,11 +151,14 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
               value={address.state}
               onChange={(e) => handleChange('state', e.target.value)}
             />
+            {errors.state && <span className="error-text">{errors.state}</span>}
           </label>
         </div>
 
         <div className="sidebar-actions">
-          <button className="save-btn" onClick={handleSave}>Save</button>
+          <button className="save-btn" onClick={handleSave}>
+            {address.id ? 'Update' : 'Save'}
+          </button>
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
         </div>
       </div>

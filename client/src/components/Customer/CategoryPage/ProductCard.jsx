@@ -11,12 +11,13 @@ const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const liked = useSelector((state) => state.products.liked.includes(product.id));
+  const likedProducts = useSelector((state) => state.products.likedProducts || []);
+const liked = likedProducts.some((p) => p.id === product.id);
 
-  const toggleLikeIcon = (e) => {
-    e.stopPropagation();
-    dispatch(toggleLike(product));
-  };
+const toggleLikeIcon = (e) => {
+  e.stopPropagation();
+  dispatch(toggleLike(product)); // Pass full product object
+};
 
   const handleCardClick = async () => {
     try {
@@ -63,8 +64,7 @@ const ProductCard = ({ product }) => {
 
       <div className="details">
         <p className="prep-time">
-          Estimated Duration:{' '}
-          {product.estimatedDuration ? `${product.estimatedDuration} mins` : 'N/A'}
+          
         </p>
         <h3>{product.name}</h3>
         <p>{product.quantity}</p>

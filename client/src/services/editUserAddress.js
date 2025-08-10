@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api/address';
 
-// Get all addresses for the logged-in user
+// ✅ Get all addresses for the logged-in user
 export const getAddress = async () => {
   const token = localStorage.getItem('token');
   const response = await axios.get(API_BASE_URL, {
@@ -10,19 +10,31 @@ export const getAddress = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
-  return response.data; // array of addresses
+  return response.data; // should be an array or single object
 };
 
-const API_URL_UPDATE = 'http://localhost:8080/api/address';
-
-// Update user address
-export const updateAddress = async (addressData) => {
+// ✅ Save or update address (auto-decides POST or PUT)
+export const saveOrUpdateAddress = async (addressData, existingAddressId = null) => {
   const token = localStorage.getItem('token');
-  const response = await axios.post(API_URL_UPDATE, addressData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-  return response.data;
+
+  // If we have an existing address ID → PUT (update), else → POST (create)
+  if (existingAddressId) {
+    // Update existing address
+    const response = await axios.put(`${API_BASE_URL}/${existingAddressId}`, addressData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } else {
+    // Create new address
+    const response = await axios.post(API_BASE_URL, addressData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  }
 };

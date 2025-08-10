@@ -7,11 +7,9 @@ const asyncActions = [login, signup, requestPasswordReset];
 const savedAuth = JSON.parse(localStorage.getItem('authData')) || {};
 
 const initialState = {
-  // Auth
   token: savedAuth.token || null,
   userId: savedAuth.userId || null,
 
-  // User Profile Info
   firstName: savedAuth.firstName || '',
   lastName: savedAuth.lastName || '',
   email: savedAuth.email || '',
@@ -19,7 +17,6 @@ const initialState = {
   profilePic: savedAuth.profilePic || '',
   roles: savedAuth.roles || [],
 
-  // Address Info
   houseNo: savedAuth.houseNo || '',
   area: savedAuth.area || '',
   landmark: savedAuth.landmark || '',
@@ -27,16 +24,13 @@ const initialState = {
   city: savedAuth.city || '',
   state: savedAuth.state || '',
 
-  // Complete address object
-  addresses: savedAuth.addresses || {},
+  addresses: savedAuth.addresses || [],
 
-  // Base Metadata
   isDeleted: savedAuth.isDeleted || false,
   createdAt: savedAuth.createdAt || null,
   updatedAt: savedAuth.updatedAt || null,
   version: savedAuth.version || null,
 
-  // UI
   loading: false,
   error: null,
   signupSuccess: false,
@@ -45,6 +39,47 @@ const initialState = {
 const saveAuthData = (state) => {
   const { loading, error, signupSuccess, ...dataToSave } = state;
   localStorage.setItem('authData', JSON.stringify(dataToSave));
+};
+
+const setUserDataFromPayload = (state, payload) => {
+  const addresses = Array.isArray(payload.addresses) ? payload.addresses : [];
+  const primaryAddress = addresses[0] || {};
+
+  state.token = payload.token || null;
+  localStorage.setItem('token', payload.token || '');
+
+  state.userId = payload.userId || null;
+  state.firstName = payload.firstName || '';
+  state.lastName = payload.lastName || '';
+  state.email = payload.email || '';
+  state.phoneNumber = payload.phoneNumber || '';
+  state.profilePic = payload.profilePic || '';
+  state.roles = payload.roles || [];
+
+  // Prefer primaryAddress values, fallback to root fields
+  state.houseNo = primaryAddress.houseNo || payload.houseNo || '';
+  state.area = primaryAddress.area || payload.area || '';
+  state.landmark = primaryAddress.landmark || payload.landmark || '';
+  state.postalCode = primaryAddress.postalCode || payload.postalCode || '';
+  state.city = primaryAddress.city || payload.city || '';
+  state.state = primaryAddress.state || payload.state || '';
+
+  state.addresses = addresses;
+
+  state.isDeleted = payload.isDeleted || false;
+  state.createdAt = payload.createdAt || null;
+  state.updatedAt = payload.updatedAt || null;
+  state.version = payload.version || null;
+
+  saveAuthData(state);
+
+  console.log("✅ Stored Redux state after auth:", {
+    houseNo: state.houseNo,
+    area: state.area,
+    city: state.city,
+    state: state.state,
+    addresses: state.addresses
+  });
 };
 
 const customerAuthSlice = createSlice({
@@ -59,11 +94,7 @@ const customerAuthSlice = createSlice({
     },
 
     logout: (state) => {
-      Object.assign(state, {
-        ...initialState,
-        token: null,
-        userId: null,
-      });
+      Object.assign(state, { ...initialState, token: null, userId: null });
       localStorage.removeItem('token');
       localStorage.removeItem('authData');
     },
@@ -72,76 +103,37 @@ const customerAuthSlice = createSlice({
       state.signupSuccess = false;
     },
 
-    // ✅ NEW reducer for updating address
     updateAddress: (state, action) => {
-      const { houseNo, area, landmark, postalCode, city, stateName } = action.payload;
+      const { houseNo, area, landmark, postalCode, city, state: stateName } = action.payload;
+
       state.houseNo = houseNo || '';
       state.area = area || '';
       state.landmark = landmark || '';
       state.postalCode = postalCode || '';
       state.city = city || '';
       state.state = stateName || '';
-      state.addresses = {
-        houseNo,
-        area,
-        landmark,
-        postalCode,
-        city,
-        state: stateName,
-      };
 
-      saveAuthData(state); // Save after updating
+      state.addresses = [
+        { houseNo, area, landmark, postalCode, city, state: stateName },
+      ];
+
+      saveAuthData(state);
     },
   },
 
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        const { addresses = {}, ...payload } = action.payload;
-
+        const payload = action.payload || {};
         state.loading = false;
-        state.token = payload.token || null;
-        localStorage.setItem('token', payload.token || '');
-
-        state.userId = payload.userId || null;
-        state.firstName = payload.firstName || '';
-        state.lastName = payload.lastName || '';
-        state.email = payload.email || '';
-        state.phoneNumber = payload.phoneNumber || '';
-        state.profilePic = payload.profilePic || '';
-        state.roles = payload.roles || [];
-
-        state.houseNo = payload.houseNo || addresses.houseNo || '';
-        state.area = payload.area || addresses.area || '';
-        state.landmark = payload.landmark || addresses.landmark || '';
-        state.postalCode = payload.postalCode || addresses.postalCode || '';
-        state.city = payload.city || addresses.city || '';
-        state.state = payload.state || addresses.state || '';
-        state.addresses = addresses;
-
-        state.isDeleted = payload.isDeleted || false;
-        state.createdAt = payload.createdAt || null;
-        state.updatedAt = payload.updatedAt || null;
-        state.version = payload.version || null;
-
-        saveAuthData(state);
+        setUserDataFromPayload(state, payload);
       })
 
       .addCase(signup.fulfilled, (state, action) => {
-        const { addresses = {}, ...payload } = action.payload;
-
+        const payload = action.payload || {};
         state.loading = false;
         state.signupSuccess = true;
-
-        state.houseNo = payload.houseNo || addresses.houseNo || '';
-        state.area = payload.area || addresses.area || '';
-        state.landmark = payload.landmark || addresses.landmark || '';
-        state.postalCode = payload.postalCode || addresses.postalCode || '';
-        state.city = payload.city || addresses.city || '';
-        state.state = payload.state || addresses.state || '';
-        state.addresses = addresses;
-
-        saveAuthData(state);
+        setUserDataFromPayload(state, payload);
       })
 
       .addCase(requestPasswordReset.fulfilled, (state) => {
@@ -159,12 +151,10 @@ const customerAuthSlice = createSlice({
 
       .addMatcher(isRejected, (state, action) => {
         state.loading = false;
-        state.error =
-          action.payload?.message || action.payload || 'Something went wrong';
+        state.error = action.payload?.message || action.payload || 'Something went wrong';
       });
   },
 });
 
-export const { logout, clearAuthMessages, resetAuthState, updateAddress } =
-  customerAuthSlice.actions;
+export const { logout, clearAuthMessages, resetAuthState, updateAddress } = customerAuthSlice.actions;
 export default customerAuthSlice.reducer;

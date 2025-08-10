@@ -1,27 +1,43 @@
+// customerAuthThunks.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  forgotPassword,
-  loginUser,
-  signupUser,
-} from '@/services/authService';
+import { loginUser, signupUser, forgotPassword } from '@/services/authService';
 import { getAddress } from '@/services/addressService';
 
 export const login = createAsyncThunk(
   'customer/login',
   async (credentials, { rejectWithValue }) => {
     try {
+      // Step 1: Login API
       const userData = await loginUser(credentials);
       localStorage.setItem('token', userData.token);
-      
-      // Fetch address and merge with user data
-      const addresses = await getAddress(userData.token);
-      const primaryAddress = addresses?.[0] || {};
-      
-      return { 
+      console.log("🔹 Raw userData from login API:", userData);
+
+      let addresses = [];
+
+      // Step 2: Try fetching address
+      try {
+        const addressResponse = await getAddress(userData.token);
+        console.log("🔹 Raw addressResponse from API:", addressResponse);
+
+        if (Array.isArray(addressResponse) && addressResponse.length > 0) {
+          addresses = addressResponse;
+        } else if (addressResponse && typeof addressResponse === 'object') {
+          addresses = [addressResponse];
+        }
+      } catch (err) {
+        // If address API fails or no address found, skip without breaking login
+        console.warn("⚠️ No address found for this user. Setting empty address fields.");
+        addresses = [];
+      }
+
+      console.log("🔹 Final normalized addresses:", addresses);
+
+      // Step 3: Return combined payload
+      return {
         ...userData,
-        ...primaryAddress, // Flatten address fields
-        addresses // Keep addresses array
+        addresses,
       };
+
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Something went wrong'

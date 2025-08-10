@@ -26,7 +26,12 @@ export const saveAddress = async (token, addressData) => {
         'Content-Type': 'application/json',
       },
     });
-    return response.data;
+
+    // If API returns array, pick first; else return object
+    if (Array.isArray(response.data)) {
+      return response.data[0] || {};
+    }
+    return response.data || {};
   } catch (error) {
     console.error('Error saving address:', error);
     throw error;

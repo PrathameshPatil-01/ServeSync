@@ -34,8 +34,7 @@
           </div>
 
           <div className="provider-card__action">
-            <span className="provider-card__price">₹{provider.chargePerHour}/hr</span>
-            <button className="provider-card__book-btn">Book Now</button>
+           
           </div>
         </div>
       </div>
