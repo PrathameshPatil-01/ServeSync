@@ -1,0 +1,88 @@
+.ad-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 20px;
+
+  text-align: center;
+}
+
+.slider-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.ad-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 20px;
+  padding: 0 20px;
+  scroll-snap-type: x mandatory;
+}
+
+.ad-card {
+  flex: 0 0 50%; /* ✅ Exactly 2 cards fit side by side */
+  height: 360px;  /* ✅ Increased height */
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  scroll-snap-align: start;
+}
+
+.ad-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.explore-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background-color: #000;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.explore-btn:hover {
+  background-color: #333;
+}
+
+.arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  line-height: 36px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.arrow-btn.left {
+  left: 10px;
+}
+
+.arrow-btn.right {
+  right: 10px;
+}
+
+/* Hide scrollbar in Chrome/Safari */
+.ad-slider::-webkit-scrollbar {
+  display: none;
+}

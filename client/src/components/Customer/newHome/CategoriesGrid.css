@@ -1,0 +1,76 @@
+.categories-section {
+  background: #fddcdc; /* slightly darker pink */
+  padding: 5rem 3rem;
+  border-radius: 36px;     /* remove border radius for full width */
+  margin: 0;
+  width: 80vw;         /* take full viewport width */
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); /* optional soft shadow */
+
+}
+
+.categories-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 3rem;
+  color: #b13535;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* wider cards */
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+.category-card {
+  background: white;
+  border-radius: 24px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-card img {
+  max-height: 80px;
+  margin-bottom: 1rem;
+}
+
+.category-card-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #333;
+}
+.categories-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3rem;
+  gap: 1.5rem;
+}
+
+.categories-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #b13535;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.categories-title-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #f5a9a9, transparent);
+}

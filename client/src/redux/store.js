@@ -1,25 +1,24 @@
 import { configureStore } from '@reduxjs/toolkit';
+import bookingReducer from './bookings/bookingSlice';
 import providerAuthReducer from './provider/auth/providerAuthSlice';
-import earningReducer from './provider/earnings/earningSlice';
-import orderReducer from './provider/orders/orderSlice';
+import customerAuthReducer from './customer/auth/customerAuthSlice';
 import providerReducer from './provider/providerSlice';
-import reviewReducer from './provider/reviews/reviewSlice';
-import scheduleReducer from './provider/schedule/scheduleSlice';
-import providerServiceOfferReducer from './provider/services/providerServiceOfferSlice';
 import searchReducer from './search/searchSlice';
-import customerServiceReducer from './services/serviceSlice'; // Renamed to avoid conflict
+import serviceReducer from './services/serviceSlice';
+import productReducer from './customer/customerProvider/productSlice';
+import cartReducer from '@/redux/customer/cartSlice';
+
 
 
 export const store = configureStore({
   reducer: {
-    search: searchReducer,
     providerAuth: providerAuthReducer,
+    customerAuth : customerAuthReducer,
     provider: providerReducer,
-    providerServiceOffer: providerServiceOfferReducer,
-    order: orderReducer,
-    schedule: scheduleReducer,
-    earning: earningReducer,
-    review : reviewReducer,
-    customerServices: customerServiceReducer, // For customer-facing service list
+    bookings: bookingReducer,
+    services: serviceReducer,
+    search: searchReducer, 
+    products: productReducer,
+    cart: cartReducer,
   },
 });

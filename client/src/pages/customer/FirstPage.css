@@ -1,0 +1,29 @@
+.main-content {
+  padding-top: 70px; /* navbar height */
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: center;     /* vertical center */
+  min-height: calc(100vh - 70px); /* take up available height */
+  flex-direction: column;  /* optional: stack children vertically */
+}
+
+
+/* Optional: make all container divs stretch full width */
+.full-width {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* App.css or Home.css */
+.main-content {
+  padding-top: 70px;
+  text-align: center;
+}
+
+
+/* Add padding or spacing if needed */
+
+
+

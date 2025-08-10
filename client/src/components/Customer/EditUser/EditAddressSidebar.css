@@ -1,0 +1,95 @@
+/* EditAddressSidebar.css */
+
+.edit-address-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999; /* Ensure it's on top of notification bar */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-address-sidebar {
+  background: white;
+  width: 400px;
+  height: 100%;
+  padding: 24px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 10000; /* Higher than notification panel */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+}
+
+.sidebar-content label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #333;
+}
+
+.sidebar-content input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.sidebar-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 10px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background-color: #e63946;
+  color: white;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: white;
+  color: #e63946;
+  border: 2px solid #e63946;
+}
+
+.cancel-btn:hover {
+  background-color: #ffe6e6;
+}

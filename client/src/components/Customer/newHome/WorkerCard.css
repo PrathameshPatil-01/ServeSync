@@ -1,0 +1,59 @@
+.worker-card {
+  flex: 0 0 220px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 270px;
+}
+
+.worker-card img {
+  max-height: 100px;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+}
+
+.worker-card h3 {
+  font-size: 1rem;
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.worker-card .subtitle {
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.add-btn {
+  border: 1px solid #e53935;
+  background: #fff;
+  color: #e53935;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+  background: #e53935;
+  color: white;
+}

@@ -1,0 +1,145 @@
+/* SubServiceList.css */
+.subservice-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
+  gap: 20px; /* space between cards */
+  padding: 20px;
+  justify-items: center; /* centers each card horizontally */
+}
+
+/* Grid container for cards */
+.subservice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cards in one row */
+  gap: 2rem;
+}
+
+
+/* SubServiceCard.css */
+.subservice-card {
+  width: 100%;
+  max-width: 280px;
+  max-height: 410px; /* Increased height */
+  background-color: #f4eeee;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  box-sizing: border-box;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distributes content evenly */
+}
+
+
+.subservice-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Image styling */
+.subservice-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+/* Optional wishlist button */
+.wishlist-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border-radius: 50%;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Info section */
+.subservice-info {
+  padding: 1.2rem;
+  flex-grow: 1;
+}
+
+.prep-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #138D75;
+  margin-bottom: 6px;
+}
+
+.subservice-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subservice-count {
+  font-size: 16px;
+  color: #666;
+  margin-top: 6px;
+}
+
+/* Footer with price and add button */
+.subservice-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.2rem;
+  border-top: 1px solid #eee;
+  margin-top: 1rem;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0;
+}
+
+.per-piece {
+  font-size: 14px;
+  color: #777;
+  margin: 0;
+}
+
+.add-btn {
+  background-color: #ff385c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+  background-color: #e02948;
+}
+.add-btn {
+  background-color: #2a9d8f; /* example primary green */
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.add-btn:hover:not(:disabled) {
+  background-color: #21867a;
+}
+
+.add-btn:disabled,
+.add-btn.added {
+  background-color: gray;
+  cursor: not-allowed;
+  color: #ddd;
+}
