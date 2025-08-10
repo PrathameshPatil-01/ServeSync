@@ -38,7 +38,7 @@ const toggleLikeIcon = (e) => {
 
       // Fetch sub-services for this provider
       const response = await axios.get(
-        `http://localhost:8080/api/service-providers/users/${providerData.providerId}/sub-services`
+        `http://localhost:8080/api/providers/users/${providerData.providerId}/sub-services`
       );
       const subServices = response.data;
       console.log('Subservices fetched:', subServices);
