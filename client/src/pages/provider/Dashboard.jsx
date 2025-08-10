@@ -1,7 +1,7 @@
 import QuickStats from '@/components/provider/dashboard/QuickStats'; // Updated import path
-import { fetchProviderOrders } from '@/redux/provider/orders/orderSlice'; // Updated import path
+import { fetchProviderOrders } from '@/redux/provider/orders/orderThunks'; // Updated import path
 import { fetchProviderDashboardStats } from '@/redux/provider/providerThunks'; // Updated import path
-import { fetchProviderServiceOffers } from '@/redux/provider/services/providerServiceOfferSlice'; // Updated import path
+import { fetchProviderServiceOffers } from '@/redux/provider/services/providerServiceOfferThunks'; // Updated import path
 import { Alert, Box, Button, CircularProgress, Grid, Paper, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

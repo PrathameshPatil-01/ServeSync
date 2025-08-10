@@ -1,40 +1,6 @@
-import axiosInstance from '@/api/axios';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { toast } from 'react-toastify';
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchProviderOrders, updateOrderStatus } from './orderThunks.js';
 
-// Async Thunks for Orders
-export const fetchProviderOrders = createAsyncThunk(
-  'order/fetchProviderOrders',
-  async ({ providerId, status, pageable }, { rejectWithValue }) => {
-    try {
-      const params = { ...pageable };
-      if (status && status !== 'all') {
-        params.status = status.toUpperCase();
-      }
-      const response = await axiosInstance.get(`/orders/provider/${providerId}`, { params });
-      return response.data;
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Failed to fetch orders';
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
-
-export const updateOrderStatus = createAsyncThunk(
-  'order/updateOrderStatus',
-  async ({ orderId, status }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.patch(`/orders/${orderId}/status`, null, { params: { status: status.toUpperCase() } });
-      toast.success(`Order #${orderId} status updated to ${status}!`);
-      return response.data;
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Failed to update order status';
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
 
 // Slice
 const orderSlice = createSlice({

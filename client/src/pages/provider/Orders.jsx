@@ -1,7 +1,7 @@
-// src/pages/provider/Orders.jsx
 import OrderCard from '@/components/provider/orders/OrderCard';
 import OrdersFilterTabs from '@/components/provider/orders/OrdersFilterTabs';
-import { clearOrderError, fetchAllProviderOrders, updateOrder } from '@/redux/provider/orders/orderSlice';
+import { clearOrderError } from '@/redux/provider/orders/orderSlice';
+import { fetchProviderOrders, updateOrderStatus } from '@/redux/provider/orders/orderThunks';
 import { Alert, Box, CircularProgress, Grid, Pagination, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,21 +11,28 @@ import { motion } from 'framer-motion';
 
 const statuses = ['all', 'pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'rejected'];
 
-export default function Orders() { // Renamed component to Orders
+export default function Orders() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.providerAuth);
     const { orders, totalPages, loading, error } = useSelector((state) => state.order);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const [page, setPage] = useState(0); // Backend uses 0-indexed pages
+    const [page, setPage] = useState(0);
 
+    // Fetch orders whenever filters change
     useEffect(() => {
         if (user?.providerId) {
-            dispatch(fetchAllProviderOrders({ providerId: user?.providerId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
+            dispatch(fetchProviderOrders({
+                providerId: user.providerId,
+                status: selectedStatus === 'all' ? null : selectedStatus,
+                searchTerm: searchTerm.trim() || null,
+                pageable: { page, size: 6 }
+            }));
         }
     }, [dispatch, user?.providerId, selectedStatus, searchTerm, page]);
 
+    // Handle API errors globally
     useEffect(() => {
         if (error) {
             toast.error(error);
@@ -34,21 +41,21 @@ export default function Orders() { // Renamed component to Orders
     }, [error, dispatch]);
 
     const handleUpdateOrderStatus = (orderId, newStatus) => {
-        dispatch(updateOrder({ orderId, newStatus }))
+        dispatch(updateOrderStatus({ orderId, newStatus }))
             .unwrap()
             .then(() => {
-                toast.success(`Order ${orderId} status updated to ${newStatus}!`);
-                // Re-fetch orders to update the list
-                dispatch(fetchAllProviderOrders({ providerId: user?.providerId, status: selectedStatus, searchTerm, pageable: { page, size: 6 } }));
+                toast.success(`Order #${orderId} status updated to ${newStatus}!`);
+                dispatch(fetchProviderOrders({
+                    providerId: user?.providerId,
+                    status: selectedStatus === 'all' ? null : selectedStatus,
+                    searchTerm: searchTerm.trim() || null,
+                    pageable: { page, size: 6 }
+                }));
             })
-            .catch(() => {
-                // Error handled by useEffect above
-            });
+            .catch(() => { /* Error handled above */ });
     };
 
     const countByStatus = useMemo(() => {
-        // This would ideally come from a separate API endpoint for accurate counts across all statuses
-        // For now, we'll count based on the currently fetched orders, which might not be comprehensive
         const counts = { all: orders.length };
         statuses.slice(1).forEach((status) => {
             counts[status] = orders.filter((o) => o.status?.toLowerCase() === status).length;
@@ -58,19 +65,15 @@ export default function Orders() { // Renamed component to Orders
 
     const handleStatusChange = (newStatus) => {
         setSelectedStatus(newStatus);
-        setPage(0); // Reset to first page when status changes
+        setPage(0);
     };
 
-    const handlePageChange = (event, value) => {
-        setPage(value - 1); // Convert to 0-indexed for backend
+    const handlePageChange = (_, value) => {
+        setPage(value - 1);
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
                 <Typography variant="h4" gutterBottom fontWeight="bold" color="primary.dark">
                     Orders
@@ -108,7 +111,7 @@ export default function Orders() { // Renamed component to Orders
                 ) : (
                     <Grid container spacing={3}>
                         {orders.map((order) => (
-                            <Grid item xs={12} md={6} lg={4} key={order.id} sx={{ display: 'flex' }}>
+                            <Grid item xs={12} md={6} lg={4} key={order.id}>
                                 <OrderCard order={order} onUpdateStatus={handleUpdateOrderStatus} />
                             </Grid>
                         ))}
@@ -119,7 +122,7 @@ export default function Orders() { // Renamed component to Orders
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                         <Pagination
                             count={totalPages}
-                            page={page + 1} // Convert to 1-indexed for UI
+                            page={page + 1}
                             onChange={handlePageChange}
                             color="primary"
                             size="large"
