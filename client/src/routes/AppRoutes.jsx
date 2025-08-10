@@ -2,7 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerRoutes from './CustomerRoutes';
 import ProviderRoutes from './ProviderRoutes';
-// import AdminRoutes from './AdminRoutes';
+import AdminRoutes from './AdminRoutes';
 // import AuthRoutes from './AuthRoutes';
 
 export default function AppRoutes() {
@@ -10,7 +10,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/customer/*" element={<CustomerRoutes />} />
       <Route path="/provider/*" element={<ProviderRoutes />} />
-      {/* <Route path="/admin/*" element={<AdminRoutes />} /> */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
