@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 
-import Home from '../pages/customer/Home.jsx';
 import MainLayout from './../components/Customer/FirstPage/MainLayout';
 import FirstPage from '@/pages/customer/FirstPage.jsx';
 import ProfileSettings from '@/pages/customer/ProfileSettings.jsx';
@@ -16,7 +15,6 @@ import CartPage from '@/pages/customer/CartPage.jsx';
 export default function CustomerRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
       <Route path="login" element={<Login/>} />
       <Route path="signup" element={<Signup/>} />
       <Route path="forgot-password" element={<ForgotPasswordForm />} />

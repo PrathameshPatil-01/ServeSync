@@ -6,7 +6,6 @@ import RoleCards from '@/components/Customer/newHome/RoleCards';
 import WorkerSection from '@/components/Customer/newHome/WorkerSection';
 import CategoriesGrid from '@/components/Customer/newHome/CategoriesGrid';
 import Navbar from '@/components/Customer/newHome/Navbar';
-import Footer from '@/components/Footer';
 export default function Home() {
   return (
     <div className ="home-wrapper" >
@@ -15,7 +14,6 @@ export default function Home() {
      <RoleCards/>
      <CategoriesGrid/>
      <WorkerSection/>
-     <Footer/>
 
     </div>
   );

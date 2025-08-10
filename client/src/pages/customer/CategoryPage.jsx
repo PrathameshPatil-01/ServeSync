@@ -8,7 +8,6 @@ import { setProducts } from '../../redux/customer/customerProvider/productSlice'
 
 import CategorySidebar from '@/components/Customer/CategoryPage/CategorySidebar';
 import ProductCard from '@/components/Customer/CategoryPage/ProductCard';
-import Footer from '@/components/Footer';
 
 // Updated import: call correct service function
 import { fetchAllUsersWithServices } from '@/services/providrservice1';
@@ -100,7 +99,6 @@ const CategoryPage = () => {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
