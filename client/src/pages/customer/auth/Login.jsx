@@ -78,7 +78,7 @@ export default function LoginForm() {
               />
 
               <Box textAlign="right">
-                <MuiLink component={Link} to="/auth/forgot-password" underline="hover" fontSize={17}>
+                <MuiLink component={Link} to="/customer/forgot-password" underline="hover" fontSize={17}>
                   Forgot Password?
                 </MuiLink>
               </Box>

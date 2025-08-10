@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './EditAddressSidebar.css';
-import { useSelector } from 'react-redux';
-import { updateAddress } from '@/services/editUserAddress';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateAddress as updateAddressService } from '@/services/editUserAddress';
+import { updateAddress } from '@/redux/customer/auth/customerAuthSlice'; // ✅ match slice export
 
 const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
   const token = useSelector((state) => state.customerAuth.token);
+  const dispatch = useDispatch();
 
   const [address, setAddress] = useState({
     houseNo: '',
@@ -19,7 +21,7 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
     console.log('userAddress passed to EditAddressSidebar:', userAddress);
     if (isOpen && userAddress) {
       setAddress({
-        houseNo: userAddress.house_no  || '',
+        houseNo: userAddress.house_no || userAddress.houseNo || '',
         area: userAddress.area || '',
         landmark: userAddress.landmark || '',
         postalCode: userAddress.postalCode || '',
@@ -37,26 +39,34 @@ const EditAddressSidebar = ({ isOpen, onClose, userAddress, onSave }) => {
   };
 
   const handleSave = async () => {
-  try {
-    // Prepare the payload matching backend
-    const formattedData = {
-      houseNo: address.houseNo,     // map your flat to houseNo here
-      area: address.area,
-      city: address.city,
-      state: address.state,
-      landmark: address.landmark,
-      country: 'India',          // hardcoded if backend expects
-      postalCode: address.postalCode,
-    };
+    try {
+      const formattedData = {
+        houseNo: address.houseNo,
+        area: address.area,
+        city: address.city,
+        stateName: address.state, // ✅ match your slice reducer key
+        landmark: address.landmark,
+        country: 'India',
+        postalCode: address.postalCode
+      };
 
-    await updateAddress(formattedData);
+      // 1️⃣ Update backend
+      await updateAddressService(formattedData);
 
-    onSave(formattedData);  // Pass updated data to parent if needed
-    onClose();             // Close sidebar after success
-  } catch (error) {
-    console.error('Error updating address:', error);
-  }
-};
+      // 2️⃣ Update Redux + localStorage instantly
+      dispatch(updateAddress(formattedData));
+
+      // 3️⃣ Callback to parent if provided
+      if (onSave) {
+        onSave(formattedData);
+      }
+
+      // 4️⃣ Close sidebar
+      onClose();
+    } catch (error) {
+      console.error('Error updating address:', error);
+    }
+  };
 
   if (!isOpen) return null;
 

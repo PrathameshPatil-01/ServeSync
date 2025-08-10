@@ -19,7 +19,7 @@ const validationSchema = Yup.object({
 
 export default function ForgotPasswordForm() {
   const dispatch = useDispatch();
-  const { loading, error, successMessage } = useSelector((state) => state.auth);
+  const { loading, error, successMessage } = useSelector((state) => state.customerAuth);
 
     useEffect(() => {
       dispatch(clearAuthMessages()); // Clear messages on component mount   
@@ -87,7 +87,7 @@ export default function ForgotPasswordForm() {
 
               <Typography variant="body2" align="center">
                 Remember your password?{' '}
-                <MuiLink component={Link} to="/auth/login" underline="hover">
+                <MuiLink component={Link} to="/customer/login" underline="hover">
                   Login
                 </MuiLink>
               </Typography>

@@ -167,7 +167,7 @@ export default function SignupForm() {
               </Typography>
 
               <Typography variant="body2" align="center">
-                <MuiLink component={Link} to="/auth/forgot-password" underline="hover">
+                <MuiLink component={Link} to="/customer/forgot-password" underline="hover">
                   Forgot Password?
                 </MuiLink>
               </Typography>

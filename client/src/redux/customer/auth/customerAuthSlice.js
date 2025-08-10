@@ -3,40 +3,48 @@ import { login, signup, requestPasswordReset } from './customerAuthThunks';
 
 const asyncActions = [login, signup, requestPasswordReset];
 
+// Load from localStorage
+const savedAuth = JSON.parse(localStorage.getItem('authData')) || {};
+
 const initialState = {
   // Auth
-  token: localStorage.getItem('token') || null,
-  userId: null,
+  token: savedAuth.token || null,
+  userId: savedAuth.userId || null,
 
   // User Profile Info
-  firstName: '',
-  lastName: '',
-  email: '',
-  phoneNumber: '',
-  profilePic: '',
-  roles: [],
+  firstName: savedAuth.firstName || '',
+  lastName: savedAuth.lastName || '',
+  email: savedAuth.email || '',
+  phoneNumber: savedAuth.phoneNumber || '',
+  profilePic: savedAuth.profilePic || '',
+  roles: savedAuth.roles || [],
 
   // Address Info
-  houseNo: '',
-  area: '',
-  landmark: '',
-  postalCode: '',
-  city: '',
-  state: '',
+  houseNo: savedAuth.houseNo || '',
+  area: savedAuth.area || '',
+  landmark: savedAuth.landmark || '',
+  postalCode: savedAuth.postalCode || '',
+  city: savedAuth.city || '',
+  state: savedAuth.state || '',
 
   // Complete address object
-  addresses: {},
+  addresses: savedAuth.addresses || {},
 
   // Base Metadata
-  isDeleted: false,
-  createdAt: null,
-  updatedAt: null,
-  version: null,
+  isDeleted: savedAuth.isDeleted || false,
+  createdAt: savedAuth.createdAt || null,
+  updatedAt: savedAuth.updatedAt || null,
+  version: savedAuth.version || null,
 
   // UI
   loading: false,
   error: null,
   signupSuccess: false,
+};
+
+const saveAuthData = (state) => {
+  const { loading, error, signupSuccess, ...dataToSave } = state;
+  localStorage.setItem('authData', JSON.stringify(dataToSave));
 };
 
 const customerAuthSlice = createSlice({
@@ -51,14 +59,38 @@ const customerAuthSlice = createSlice({
     },
 
     logout: (state) => {
-      state.token = null;
-      state.userId = null;
-      Object.assign(state, initialState);
+      Object.assign(state, {
+        ...initialState,
+        token: null,
+        userId: null,
+      });
       localStorage.removeItem('token');
+      localStorage.removeItem('authData');
     },
 
     resetAuthState: (state) => {
       state.signupSuccess = false;
+    },
+
+    // ✅ NEW reducer for updating address
+    updateAddress: (state, action) => {
+      const { houseNo, area, landmark, postalCode, city, stateName } = action.payload;
+      state.houseNo = houseNo || '';
+      state.area = area || '';
+      state.landmark = landmark || '';
+      state.postalCode = postalCode || '';
+      state.city = city || '';
+      state.state = stateName || '';
+      state.addresses = {
+        houseNo,
+        area,
+        landmark,
+        postalCode,
+        city,
+        state: stateName,
+      };
+
+      saveAuthData(state); // Save after updating
     },
   },
 
@@ -66,12 +98,11 @@ const customerAuthSlice = createSlice({
     builder
       .addCase(login.fulfilled, (state, action) => {
         const { addresses = {}, ...payload } = action.payload;
-        
+
         state.loading = false;
         state.token = payload.token || null;
         localStorage.setItem('token', payload.token || '');
 
-        // User Info
         state.userId = payload.userId || null;
         state.firstName = payload.firstName || '';
         state.lastName = payload.lastName || '';
@@ -80,7 +111,6 @@ const customerAuthSlice = createSlice({
         state.profilePic = payload.profilePic || '';
         state.roles = payload.roles || [];
 
-        // Map address data - use direct fields first, fallback to addresses object
         state.houseNo = payload.houseNo || addresses.houseNo || '';
         state.area = payload.area || addresses.area || '';
         state.landmark = payload.landmark || addresses.landmark || '';
@@ -89,11 +119,12 @@ const customerAuthSlice = createSlice({
         state.state = payload.state || addresses.state || '';
         state.addresses = addresses;
 
-        // Metadata
         state.isDeleted = payload.isDeleted || false;
         state.createdAt = payload.createdAt || null;
         state.updatedAt = payload.updatedAt || null;
         state.version = payload.version || null;
+
+        saveAuthData(state);
       })
 
       .addCase(signup.fulfilled, (state, action) => {
@@ -102,7 +133,6 @@ const customerAuthSlice = createSlice({
         state.loading = false;
         state.signupSuccess = true;
 
-        // Map address data for signup
         state.houseNo = payload.houseNo || addresses.houseNo || '';
         state.area = payload.area || addresses.area || '';
         state.landmark = payload.landmark || addresses.landmark || '';
@@ -110,6 +140,8 @@ const customerAuthSlice = createSlice({
         state.city = payload.city || addresses.city || '';
         state.state = payload.state || addresses.state || '';
         state.addresses = addresses;
+
+        saveAuthData(state);
       })
 
       .addCase(requestPasswordReset.fulfilled, (state) => {
@@ -127,10 +159,12 @@ const customerAuthSlice = createSlice({
 
       .addMatcher(isRejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || action.payload || 'Something went wrong';
+        state.error =
+          action.payload?.message || action.payload || 'Something went wrong';
       });
   },
 });
 
-export const { logout, clearAuthMessages, resetAuthState } = customerAuthSlice.actions;
+export const { logout, clearAuthMessages, resetAuthState, updateAddress } =
+  customerAuthSlice.actions;
 export default customerAuthSlice.reducer;

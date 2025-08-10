@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
 
   const toggleLikeIcon = (e) => {
     e.stopPropagation();
-    dispatch(toggleLike(product.id));
+    dispatch(toggleLike(product));
   };
 
   const handleCardClick = async () => {

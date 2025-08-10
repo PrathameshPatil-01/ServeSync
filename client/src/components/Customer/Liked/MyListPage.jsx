@@ -4,13 +4,19 @@ import ProductCard from '../CategoryPage/ProductCard';
 import './MyListPage.css';
 
 const MyListPage = () => {
-  const likedProducts = useSelector(state => state.products.likedProducts);
+  // Ensure we safely read liked products (fallback to empty array)
+  const likedProducts = useSelector(
+    (state) => state.products?.likedProducts || []
+  );
 
   return (
     <div className="liked-page-wrapper">
       <div className="liked-header">
         <h2>❤️ My Liked Providers</h2>
-        <p>{likedProducts.length} provider{likedProducts.length !== 1 && 's'} liked</p>
+        <p>
+          {likedProducts.length} provider
+          {likedProducts.length !== 1 && 's'} liked
+        </p>
       </div>
 
       {likedProducts.length === 0 ? (
@@ -19,8 +25,8 @@ const MyListPage = () => {
         </div>
       ) : (
         <div className="liked-card-grid">
-          {likedProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+          {likedProducts.map((product) => (
+            <ProductCard key={product.id || product.name} product={product} />
           ))}
         </div>
       )}
